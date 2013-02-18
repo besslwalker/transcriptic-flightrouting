@@ -21,7 +21,7 @@ This is an optimization problem, so your goal isn't just to return any solution,
 
 ## Solution Guidelines
 
-You can use C, C++, Java, Python, Perl, Ruby, PHP, Clojure, or Scala in your solution.  If your solution does not compile to a single executable, please provide a script such that your solution is invokable using:
+You can use C, C++, Java, Python, Perl, Ruby, PHP, Clojure, or Scala in your solution.  Please provide a script such that your solution is invokable using:
 
     `./flightrouting cities.csv tickets.csv`
 
