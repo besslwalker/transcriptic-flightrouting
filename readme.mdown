@@ -32,3 +32,5 @@ For example, if using Java, you might provide a file `flightrouting` that contai
 Scripting languages such as Python and Ruby should be fine as-is.
 
 Your solution should run a standalone application without requiring any external resources (i.e., remote servers).  Your solution should take no longer than **60 seconds** to run.
+
+Your solution results should be written to **STDOUT**.
