@@ -21,12 +21,14 @@ This is an optimization problem, so your goal isn't just to return any solution,
 
 ## Solution Guidelines
 
-You can use C, C++, Java, Python, Perl, Ruby, PHP, Clojure, or Scala in your solution.  Please provide a script such that your solution is invokable using:
+You can use C, C++, Java, Python, Perl, Ruby, PHP, Javascript, Clojure, or Scala in your solution.  Please provide a script such that your solution is invokable using:
 
     `./flightrouting cities.csv tickets.csv`
 
 For example, if using Java, you might provide a file `flightrouting` that contains:
 
     `java -cp flightrouting.jar flightrouting.Main`
+
+Scripting languages such as Python and Ruby should be fine as-is.
 
 Your solution should run a standalone application without requiring any external resources (i.e., remote servers).  Your solution should take no longer than **60 seconds** to run.
