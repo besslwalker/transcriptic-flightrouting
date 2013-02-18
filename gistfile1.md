@@ -1,0 +1,13 @@
+An airline wants to serve its passengers as efficiently as possible. This airline's network is defined as the set of cities (A, B, C, ..., AA, AB, ...) it serves. Each city has a coordinate in 2D euclidian space (x, y) that defines its location. At any given time, the airline has a set of tickets that are active; that is, need to be flown. A ticket is a tuple of cities (A, B) giving the passenger's starting and ending cities. The airline needs to turn each ticket into an itinerary, which is an ordered list of flights to be made to deliver the passenger from point A to point B. The choice of legs to serve depends on the overall demands of the network. The airline is tracking two distinct key metrics: total distance flown and number of legs flown. The total distance flown should be minimized in order to save fuel, which is very expensive. However, the number of legs flown should also be kept down since aircraft maintenance, and eventual retirement, is partly based on "cycles," or takeoffs and landings. Therefore, given:
+
+1. a map of cities -> (x, y) coordinates, and,
+2. a list of tickets (city pairs to be transited)
+
+determine:
+
+1. the list of cities to connect directly (legs to offer),
+2. the itinerary to fly for each ticket,
+3. the total expected mileage to fly, and,
+4. the total expected number of takeoffs needed to clear the tickets given.
+
+This is an optimization problem, so your goal isn't just to return any solution, but the most efficient one you can find. You're welcome to cite (and build off of) recent literature in constructing your solution. A theoretical explanation of the challenges inherent in this problem along with your concrete solution is a major bonus.
