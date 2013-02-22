@@ -76,6 +76,14 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
+    # Removes a leg from the graph
+    def remove_leg(self, from_city, to_city):
+        self.matrix[from_city][to_city].exists = False
+        
+    # Adds a leg to the graph
+    def add_leg(self, from_city, to_city):
+        self.matrix[from_city][to_city].exists = True
+        
     # Returns a new Routing that is the minimum spanning tree of the cities in this Routing.
     # The Legs of the new Routing are independent, but the Cities are not.
     # (For independent Cities, initialize mst with a deep copy of city_list.)
@@ -119,9 +127,9 @@ class Routing:
                     distance[to_city] = edge.miles
                     # Update parent and connecting edge
                     if parent[to_city]:  # If we had a parent, disconnect it
-                        mst.matrix[parent[to_city]][to_city].exists = False
+                        mst.remove_leg(parent[to_city], to_city)
                     parent[to_city] = from_city
-                    mst.matrix[parent[to_city]][to_city].exists = True
+                    mst.add_leg(parent[to_city], to_city)
                  
             from_city = mst_cities[0]
             dist = float("Inf")
