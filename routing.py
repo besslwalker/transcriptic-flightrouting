@@ -2,7 +2,7 @@
 # Bess L. Walker
 # 2-22-13
 
-# The points on our graph are Cities, consisting of an id, x coordinate, and y coordinate.
+# The vertices in our graph are Cities, consisting of an id, x coordinate, and y coordinate.
 class City:
     def __init__(self, id, x, y):
         self.id = id
@@ -11,6 +11,18 @@ class City:
         
     def __repr__(self):
         return "".join(["<City:", str(self.id), "(", str(self.x), ",", str(self.y), ")>"])
+        
+    def __str__(self):
+        return self.__repr__()
+        
+# The (directed) edges of our graph are Legs, consisting of a from_city and a to_city
+class Leg:
+    def __init__(self, from_city, to_city):
+        self.from_city = from_city
+        self.to_city   = to_city
+        
+    def __repr__(self):
+        return "".join(["<Leg:", str(self.from_city.id), "->", str(self.to_city.id), ">"])
         
     def __str__(self):
         return self.__repr__()
