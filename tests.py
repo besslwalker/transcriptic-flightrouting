@@ -45,3 +45,9 @@ b 0 0"""
 city_list = flightrouting.load_cities("testfiles/1_city.csv")
 assert len(city_list) == 1
 assert repr(city_list[0]) == "<City:c(3,4)>"
+
+# Check creating a graph from loaded cities
+g1 = routing.Routing(city_list)
+assert str(g1) == \
+"""  c
+c 0"""
