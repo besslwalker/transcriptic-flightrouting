@@ -15,7 +15,7 @@ class City:
         return "".join(["<City:", str(self.id), "(", str(self.x), ",", str(self.y), ")>"])
         
     def __str__(self):
-        return self.__repr__()
+        return str(self.id)
     
     # Returns the Euclidean distance between this City and another City    
     def distance_to(self, to_city):
@@ -49,4 +49,9 @@ class Routing:
             self.matrix[from_city] = {}
             for to_city in city_list:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
+                
+    def __repr__(self):
+        cities = self.matrix.keys()
+        cities_str = ",".join([str(city) for city in cities])
+        return "".join(["<Routing:", cities_str, ">"])
             
