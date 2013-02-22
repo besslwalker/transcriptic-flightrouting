@@ -31,6 +31,7 @@ assert e12.exists == True
 g = routing.Routing([p1, p2])
 
 assert g.matrix[p2][p2].exists == False
+assert g.sorted_cities() == [p1, p2]
 
 # Check __repr__ and __str__ methods for Routing
 assert repr(g) == "<Routing:a,b>"
