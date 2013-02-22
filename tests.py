@@ -21,3 +21,11 @@ assert p1.distance_to(p1) == 0.0
 assert p1.distance_to(p2) == p2.distance_to(p1)
 
 assert e21.miles == p2.distance_to(p1)
+
+# Check leg existence
+assert e12.exists == True
+
+# Initialize a routing
+g = routing.Routing([p1, p2])
+
+assert g.matrix[p2][p2].exists == False

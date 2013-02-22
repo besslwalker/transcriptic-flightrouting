@@ -25,9 +25,10 @@ class City:
         
 # The (directed) edges of our graph are Legs, consisting of a from_city and a to_city
 class Leg:
-    def __init__(self, from_city, to_city):
+    def __init__(self, from_city, to_city, exists = True):
         self.from_city = from_city
         self.to_city   = to_city
+        self.exists    = exists
         
         self.miles = from_city.distance_to(to_city)
         
@@ -36,3 +37,16 @@ class Leg:
         
     def __str__(self):
         return self.__repr__()
+
+# The graph itself is a routing, a set of legs to be flown.
+# Since it is a weighted graph, it is most convenient to represent it as a Leg matrix.
+# Initially, the graph is unconnected: the legs don't exist    
+class Routing:
+    # Initialize the empty routing
+    def __init__(self, city_list):
+        self.matrix = {}
+        for from_city in city_list:
+            self.matrix[from_city] = {}
+            for to_city in city_list:
+                self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
+            
