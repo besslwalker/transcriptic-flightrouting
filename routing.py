@@ -44,6 +44,9 @@ class Leg:
 class Routing:
     # Initialize the empty routing
     def __init__(self, city_list):
+        self.init_from_list(city_list)
+                
+    def init_from_list(self, city_list):
         self.matrix = {}
         for from_city in city_list:
             self.matrix[from_city] = {}
@@ -73,6 +76,8 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
-        
+    # Returns a new Routing that is the minimum spanning tree of the cities in this Routing.
+    def minimum_spanning_tree(self):
+        pass        
         
             
