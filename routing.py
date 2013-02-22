@@ -51,7 +51,26 @@ class Routing:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
     def __repr__(self):
-        cities = self.matrix.keys()
-        cities_str = ",".join([str(city) for city in cities])
+        alpha_cities = self.sorted_cities()
+        cities_str = ",".join([str(city) for city in alpha_cities])
         return "".join(["<Routing:", cities_str, ">"])
+        
+    def __str__(self):
+        alpha_cities = self.sorted_cities()
+        label_row = " ".join([" "] + [city.id for city in alpha_cities])
+        
+        row_strs = [label_row]
+
+        for from_city in alpha_cities:
+            adj_dict = self.matrix[from_city]
+            adj_exists = [int(adj_dict[to_city].exists) for to_city in alpha_cities]
+            exists_str = " ".join([str(from_city)] + [str(exists) for exists in adj_exists])
+            row_strs.append(exists_str)
+                    
+        return "\n".join(row_strs)
+    
+    # Returns a list of the cities in the graph, sorted by id    
+    def sorted_cities(self):
+        return sorted(self.matrix.keys(), key = lambda city: city.id)
+        
             

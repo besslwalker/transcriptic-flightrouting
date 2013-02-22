@@ -34,3 +34,7 @@ assert g.matrix[p2][p2].exists == False
 
 # Check __repr__ and __str__ methods for Routing
 assert repr(g) == "<Routing:a,b>"
+assert str(g)  == \
+"""  a b
+a 0 0
+b 0 0"""
