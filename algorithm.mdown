@@ -1,0 +1,7 @@
+# Analysis
+
+This problem is essentially equivalent to the metric Steiner tree problem, which is NP-complete.  That is, in order to find the legs which will minimize mileage, we must find the Steiner tree of the complete graph formed by the cities.  The set of cities at the origins and destinations of the tickets form the set of points which must be in the tree; the remaining cities are optional.
+
+Note: When the ticket list contains every city, the problem simplifies dramatically: the legs chosen should be those of the minimum spanning tree.
+
+Once the Steiner tree is calculated, assigning itineraries to tickets is trivial, since in a tree there is only one path between any two points.
