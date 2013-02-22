@@ -8,4 +8,14 @@ Once the Steiner tree is calculated, assigning itineraries to tickets is trivial
 
 ## Algorithm
 
-Since an optimal solution is required, a heuristic isn't good enough: a branch-and-bound approach is necessary.
+Since an optimal solution is required, a heuristic isn't good enough: a branch-and-bound approach is necessary.  The logically simplest element to branch on is the legs of the routing, since those are what we're concerned with finding.
+
+The MST of the entire set of cities serves as a reasonable starting upper bound.
+
+### Brute-force branching -- suitable only for small examples, but shakes out I/O and verification issues
+
+0. The current known-best solution is the MST of the cities.
+
+1. Use recursive branching to generate all possible INCLUDED / EXCLUDED combinations of legs.
+  - when no UNDECIDED legs remain, evaluate the resulting graph: are all required cities reachable?
+  - if the graph is valid, calculate the total mileage; if it is better than the known-best solution, it becomes the known-best solution.
