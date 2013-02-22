@@ -51,3 +51,26 @@ g1 = routing.Routing(city_list)
 assert str(g1) == \
 """  c
 c 0"""
+
+# Check minimum spanning tree
+# On zero nodes:
+g0 = routing.Routing([])
+assert str(g0.minimum_spanning_tree()) == " "
+# On one node:
+assert str(g1.minimum_spanning_tree()) == \
+"""  c
+c 0"""
+# On two nodes:
+g2 = g
+assert str(g.minimum_spanning_tree()) == \
+"""  a b
+a 0 1
+b 0 0"""
+# On three nodes:
+c3 = flightrouting.load_cities("testfiles/3_cities.csv")
+g3 = routing.Routing(c3)
+assert str(g3.minimum_spanning_tree()) == \
+"""  a b c
+a 0 0 1
+b 0 0 0
+c 0 1 0"""
