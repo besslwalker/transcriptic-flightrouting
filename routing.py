@@ -72,7 +72,8 @@ class Routing:
                     
         return "\n".join(row_strs)
     
-    # Returns a list of the cities in the graph, sorted by id    
+    # Returns a list of the cities in the graph, sorted by id   
+    # Mostly useful to enforce an order so that output is consistent. 
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
@@ -83,6 +84,16 @@ class Routing:
     # Adds a leg to the graph
     def add_leg(self, from_city, to_city):
         self.matrix[from_city][to_city].exists = True
+    
+    # Returns a list of existing legs    
+    def existing_legs(self):
+        legs = []
+        for from_city in self.sorted_cities():
+            from_legs = [self.matrix[from_city][to_city] for to_city in self.sorted_cities()]
+            exist_legs = [leg for leg in from_legs if leg.exists]
+            legs += exist_legs
+            
+        return legs
         
     # Returns a new Routing that is the minimum spanning tree of the cities in this Routing.
     # The Legs of the new Routing are independent, but the Cities are not.
