@@ -3,6 +3,7 @@
 # 2-22-13
 
 import routing
+import flightrouting
 
 # Initialize some basic points & edges
 p1 = routing.City('a', 0, 0)
@@ -39,3 +40,8 @@ assert str(g)  == \
 """  a b
 a 0 0
 b 0 0"""
+
+# Check loading cities from file
+city_list = flightrouting.load_cities("testfiles/1_city.csv")
+assert len(city_list) == 1
+assert repr(city_list[0]) == "<City:c(3,4)>"

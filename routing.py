@@ -73,4 +73,6 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
+        
+        
             
