@@ -97,13 +97,17 @@ class Routing:
     def add_leg(self, from_city, to_city):
         self.matrix[from_city][to_city].exists = True
     
-    # Returns a list of existing legs    
-    def existing_legs(self):
+    # Returns a list of legs, by default only those which exist.
+    # Warning: setting existing_only to False will return a list that's n**2 in the number of cities.    
+    def legs(self, existing_only = True):
         legs = []
         for from_city in self.sorted_cities():
             from_legs = [self.matrix[from_city][to_city] for to_city in self.sorted_cities()]
-            exist_legs = [leg for leg in from_legs if leg.exists]
-            legs += exist_legs
+            if existing_only:
+                exist_legs = [leg for leg in from_legs if leg.exists]
+                legs += exist_legs
+            else:
+                legs += from_legs
             
         return legs
                     

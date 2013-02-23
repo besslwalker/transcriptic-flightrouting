@@ -35,12 +35,12 @@ assert g.matrix[p2][p2].exists == False
 assert g.sorted_cities() == [p1, p2]
 
 # Test leg addition and removal
-assert g.existing_legs() == []
+assert g.legs() == []
 g.add_leg(p2, p1)
-assert str(g.existing_legs()) == "[<Leg:b->a>]"
+assert str(g.legs()) == "[<Leg:b->a>]"
 g.remove_leg(p2, p1)
 g.remove_leg(p1, p2)
-assert g.existing_legs() == []
+assert g.legs() == []
 
 # Check __repr__ and __str__ methods for Routing
 assert repr(g) == "<Routing:a,b>"
