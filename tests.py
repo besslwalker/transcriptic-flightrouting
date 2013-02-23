@@ -65,3 +65,13 @@ t1 = routing.Ticket(p2, p1)
 
 # Check repr() and str() methods
 assert repr(t1) == "<Ticket:b->a>"
+
+# Check city id to City dictionary maker
+three_cities = flightrouting.load_cities("3_cities.csv")
+d = flightrouting.make_city_dict(three_cities)
+assert repr(d["b"]) == "<City:b(1,1)>"
+
+# Check ticket loader
+t = flightrouting.load_tickets("2_tickets.csv", d)
+assert len(t) == 1
+assert repr(t[0]) == "<Ticket:a->c>"
