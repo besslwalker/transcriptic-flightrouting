@@ -33,7 +33,19 @@ class Leg:
         self.miles = from_city.distance_to(to_city)
         
     def __repr__(self):
-        return "".join(["<Leg:", str(self.from_city.id), "->", str(self.to_city.id), ">"])
+        return "".join(["<Leg:", str(self.from_city), "->", str(self.to_city), ">"])
+        
+    def __str__(self):
+        return self.__repr__()
+        
+# A Ticket consists of an origin City, a destination City, and a list of Legs to fly.
+class Ticket:
+    def __init__(self, from_city, to_city):
+        self.from_city = from_city
+        self.to_city   = to_city
+        
+    def __repr__(self):
+        return "".join(["<Ticket:", str(self.from_city), "->", str(self.to_city), ">"])
         
     def __str__(self):
         return self.__repr__()

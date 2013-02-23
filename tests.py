@@ -50,7 +50,7 @@ a 0 0
 b 0 0"""
 
 # Check loading cities from file
-city_list = flightrouting.load_cities("testfiles/1_city.csv")
+city_list = flightrouting.load_cities("1_city.csv")
 assert len(city_list) == 1
 assert repr(city_list[0]) == "<City:c(3,4)>"
 
@@ -59,3 +59,9 @@ g1 = routing.Routing(city_list)
 assert str(g1) == \
 """  c
 c 0"""
+
+# Create Ticket object
+t1 = routing.Ticket(p2, p1)
+
+# Check repr() and str() methods
+assert repr(t1) == "<Ticket:b->a>"
