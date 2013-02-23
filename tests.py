@@ -2,6 +2,7 @@
 # Bess L. Walker
 # 2-22-13
 
+import math
 import routing
 import flightrouting
 
@@ -67,15 +68,15 @@ t1 = routing.Ticket(p2, p1)
 assert repr(t1) == "<Ticket:b->a>"
 
 # Check routing validation
-g.matrix[p1][p2].exists = True
+g.add_leg(p1, p2)
 assert g.is_valid([t1]) == False
 
-g.matrix[p1][p2].exists = False
-g.matrix[p2][p1].exists = True
+g.remove_leg(p1, p2)
+g.add_leg(p2, p1)
 assert g.is_valid([t1]) == True
 assert g.is_valid([routing.Ticket(p1, p2)]) == False
 
-g.matrix[p2][p1].exists = False
+g.remove_leg(p2, p1)
 
 # Check city id to City dictionary maker
 three_cities = flightrouting.load_cities("3_cities.csv")
@@ -86,3 +87,43 @@ assert repr(d["b"]) == "<City:b(1,1)>"
 t = flightrouting.load_tickets("2_tickets.csv", d)
 assert len(t) == 1
 assert repr(t[0]) == "<Ticket:a->c>"
+
+# Test cost method
+g.add_leg(p2, p1)
+assert g.cost(1.0, 0.2, [t1]) == e21.miles + .2
+
+cities = flightrouting.load_cities("triangle_cities.csv")
+assert str(cities) == "[<City:a(1,0)>, <City:b(0,2)>, <City:c(2,2)>, <City:d(1,1)>]"
+city_dict = flightrouting.make_city_dict(cities)
+tickets = flightrouting.load_tickets("triangle_tickets.csv", city_dict)
+assert str(tickets) == "[<Ticket:a->b>, <Ticket:a->c>]"
+
+tri_route = routing.Routing(cities)
+
+# A suboptimal routing
+tri_route.add_leg(city_dict["a"], city_dict["b"])
+tri_route.add_leg(city_dict["a"], city_dict["c"])
+assert str(tri_route) == \
+"""  a b c d
+a 0 1 1 0
+b 0 0 0 0
+c 0 0 0 0
+d 0 0 0 0"""
+assert tri_route.is_valid(tickets) == True
+assert tri_route.cost(1.0, 0.2, tickets) == 2 * math.sqrt(5) * 1.0 + 2 * 0.2
+
+tri_route.remove_leg(city_dict["a"], city_dict["b"])
+tri_route.remove_leg(city_dict["a"], city_dict["c"])
+
+# An optimal routing
+tri_route.add_leg(city_dict["a"], city_dict["d"])
+tri_route.add_leg(city_dict["d"], city_dict["b"])
+tri_route.add_leg(city_dict["d"], city_dict["c"])
+assert str(tri_route) == \
+"""  a b c d
+a 0 0 0 1
+b 0 0 0 0
+c 0 0 0 0
+d 0 1 1 0"""
+assert tri_route.is_valid(tickets) == True
+assert str(tri_route.cost(1.0, 0.2, tickets)) == str((1 + 2 * math.sqrt(2)) * 1.0 + 3 * 0.2)

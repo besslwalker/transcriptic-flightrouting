@@ -147,9 +147,22 @@ class Routing:
                 return False
                 
         return True
-            
-            
-            
+    
+    # Given costs per mile and per takeoff, and a list of Tickets, 
+    # returns the cost of flying those flights with this routing.
+    # 
+    # Currently ignores the tickets entirely and just calculates the cost of flying
+    # each leg of the routing once.        
+    def cost(self, mile_cost, takeoff_cost, tickets):
+        legs = self.legs()
+        miles = sum([leg.miles for leg in legs])
+        
+        # The number of takeoffs is the same as the number of cities with IN edges
+        to_cities = [leg.to_city for leg in legs]
+        deduped_to_cities = set(to_cities)
+        takeoffs = len(deduped_to_cities)
+        
+        return miles * mile_cost + takeoffs * takeoff_cost
         
         
             
