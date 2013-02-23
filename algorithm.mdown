@@ -1,16 +1,15 @@
 ## Analysis
 
-This problem is essentially equivalent to the metric Steiner tree problem, which is NP-complete.  That is, in order to find the legs which will minimize mileage, we must find the Steiner tree of the complete graph formed by the cities.  The set of cities at the origins and destinations of the tickets form the set of points which must be in the tree; the remaining cities are optional.
+This problem is reducible from the metric Steiner tree problem, which means it is NP complete.  
 
-Note: When the ticket list contains every city, the problem simplifies dramatically: the legs chosen should be those of the minimum spanning tree.
+A greedy algorithm which simply adds legs as needed to fulfill tickets (removing legs then made redundant, similar to growing a minimum spanning tree) will provide a reasonable solution, but it will ignore any unticketed cities and therefore can't be guaranteed to be optimal.  (Unless all cities appear on tickets, in which case hurrah!)
 
-Once the Steiner tree is calculated, assigning itineraries to tickets is trivial, since in a tree there is only one path between any two points.
 
 ## Algorithm
 
 Since an optimal solution is required, a heuristic isn't good enough: a branch-and-bound approach is necessary.  The logically simplest element to branch on is the legs of the routing, since those are what we're concerned with finding.
 
-The MST of the entire set of cities serves as a reasonable starting upper bound.
+The routing produced by the greedy algorithm briefly described above provides a reasonable starting upper bound.
 
 ### Brute-force branching -- suitable only for small examples, but shakes out I/O and verification issues
 
@@ -18,4 +17,4 @@ The MST of the entire set of cities serves as a reasonable starting upper bound.
 
 1. Use recursive branching to generate all possible INCLUDED / EXCLUDED combinations of legs.
   - when no UNDECIDED legs remain, evaluate the resulting graph: are all required cities reachable?
-  - if the graph is valid, calculate the total mileage; if it is better than the known-best solution, it becomes the known-best solution.
+  - if the graph is valid, calculate the cost; if it is better than the known-best solution, it becomes the known-best solution.
