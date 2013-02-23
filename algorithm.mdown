@@ -13,7 +13,7 @@ The routing produced by the greedy algorithm briefly described above provides a 
 
 ### Brute-force branching -- suitable only for small examples, but shakes out I/O and verification issues
 
-0. The current known-best solution is the MST of the cities.
+0. The cost of the current known-best solution is Inf.
 
 1. Use recursive branching to generate all possible INCLUDED / EXCLUDED combinations of legs.
   - when no UNDECIDED legs remain, evaluate the resulting graph: are all required cities reachable?
