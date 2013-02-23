@@ -94,64 +94,7 @@ class Routing:
             legs += exist_legs
             
         return legs
-        
-    # Returns a new Routing that is the minimum spanning tree of the cities in this Routing.
-    # The Legs of the new Routing are independent, but the Cities are not.
-    # (For independent Cities, initialize mst with a deep copy of city_list.)
-    def minimum_spanning_tree(self):
-        city_list = self.matrix.keys()   
-        mst = Routing(city_list)
-        
-        if len(city_list) == 0:
-            return mst
-        
-        # Without a union-find data structure, Kruskal's MST algorithm
-        # is really no better than a decent implementation of Prim's.
-        # Since I've no desire to write a union-find, I'll just use Prim's.
-        # This implementation is based on the one in Steven Skiena's
-        # The Algorithm Design Manual, 2nd Edition, pg. 194-195
-        
-        # Tracking of City traits in the tree needs to happen here
-        # rather than through data members of the City class, since
-        # the Cities are shared across any graphs which use them.
-        mst_cities = mst.sorted_cities()  # if Cities become independent, this gets the right ones.
-        connected = {}
-        distance  = {}
-        parent    = {}
-        for city in mst_cities:
-            connected[city] = False
-            distance[city]  = float("Inf")
-            parent[city]    = None
-            
-        # Choose starting vertex    
-        from_city = mst_cities[0]
-        distance[from_city] = 0
-        
-        # Find MST
-        while connected[from_city] == False:
-            connected[from_city] = True
-            
-            # Weigh the edges from this city
-            for to_city in mst_cities:
-                edge = mst.matrix[from_city][to_city]
-                if distance[to_city] > edge.miles and not connected[to_city]:
-                    distance[to_city] = edge.miles
-                    # Update parent and connecting edge
-                    if parent[to_city]:  # If we had a parent, disconnect it
-                        mst.remove_leg(parent[to_city], to_city)
-                    parent[to_city] = from_city
-                    mst.add_leg(parent[to_city], to_city)
-                 
-            from_city = mst_cities[0]
-            dist = float("Inf")
-            for city in mst_cities:
-                if not connected[city] and dist > distance[city]:
-                    dist = distance[city]
-                    from_city = city
                     
-                    
-        return mst
-                
             
             
         
