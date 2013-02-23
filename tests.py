@@ -66,6 +66,17 @@ t1 = routing.Ticket(p2, p1)
 # Check repr() and str() methods
 assert repr(t1) == "<Ticket:b->a>"
 
+# Check routing validation
+g.matrix[p1][p2].exists = True
+assert g.is_valid([t1]) == False
+
+g.matrix[p1][p2].exists = False
+g.matrix[p2][p1].exists = True
+assert g.is_valid([t1]) == True
+assert g.is_valid([routing.Ticket(p1, p2)]) == False
+
+g.matrix[p2][p1].exists = False
+
 # Check city id to City dictionary maker
 three_cities = flightrouting.load_cities("3_cities.csv")
 d = flightrouting.make_city_dict(three_cities)

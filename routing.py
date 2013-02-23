@@ -3,6 +3,7 @@
 # 2-22-13
 
 import math
+from collections import deque
 
 # The vertices in our graph are Cities, consisting of an id, x coordinate, and y coordinate.
 class City:
@@ -110,7 +111,43 @@ class Routing:
                 legs += from_legs
             
         return legs
-                    
+        
+    # Returns True if routes satisfying all tickets exist.  
+    # Currently implemented naively.
+    def is_valid(self, tickets):
+        cities = self.sorted_cities()
+        
+        for ticket in tickets:
+            # Determine reachability via BFS
+            
+            discovered = {}
+            processed  = {}
+            for city in cities:
+                discovered[city] = False
+                processed[city] = False
+                
+            discovered[ticket.from_city] = True
+            queue = deque([ticket.from_city])
+            while len(queue) != 0:
+                from_city = queue.popleft()
+                # If we're at the destination, we're done with this ticket.
+                if from_city == ticket.to_city:
+                    break
+                
+                # Process
+                connections = [to_city for to_city in self.matrix[from_city] if self.matrix[from_city][to_city].exists]
+                for to_city in connections:
+                    if not discovered[to_city]:
+                        discovered[to_city] = True
+                        queue.append(to_city)
+                
+                processed[from_city] = True
+            else: # Whoops, we ran out of cities to check but never found the destination!
+                # This ticket can't be satisfied, so...
+                return False
+                
+        return True
+            
             
             
         
