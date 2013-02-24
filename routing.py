@@ -66,6 +66,33 @@ class Routing:
             for to_city in city_list:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
+        self.undecided = self.legs(existing_only = False)
+        self.included  = []
+        self.excluded  = []
+    
+    # Creates a copy with independent Legs but not independent Cities.            
+    def deepleg_copy(self):
+        cities = self.sorted_cities()
+        new_routing = Routing(cities)
+        new_routing.undecided = []  # We don't want all legs undecided in the copy
+        
+        # Copy information from this routing into the new routing
+        for from_city in cities:
+            for to_city in cities:
+                leg = self.matrix[from_city][to_city]
+                new_leg = new_routing.matrix[from_city][to_city]
+                if leg.exists:
+                    new_routing.add_leg(from_city, to_city)
+                    
+                if leg in self.included:
+                    new_routing.included.append(new_leg)
+                elif leg in self.excluded:
+                    new_routing.excluded.append(new_leg)
+                else:
+                    new_routing.undecided.append(new_leg)
+                    
+        return new_routing
+                
     def __repr__(self):
         alpha_cities = self.sorted_cities()
         cities_str = ",".join([str(city) for city in alpha_cities])

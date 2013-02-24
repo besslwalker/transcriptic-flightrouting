@@ -127,3 +127,9 @@ c 0 0 0 0
 d 0 1 1 0"""
 assert tri_route.is_valid(tickets) == True
 assert str(tri_route.cost(1.0, 0.2, tickets)) == str((1 + 2 * math.sqrt(2)) * 1.0 + 3 * 0.2)
+
+# Test Routing's copy method and leg independence
+h = tri_route.deepleg_copy()
+
+assert str(h) == str(tri_route)
+assert h.legs(existing_only = False) != tri_route.legs(existing_only = False)
