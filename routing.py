@@ -117,11 +117,35 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
-    # Removes a leg from the graph
+    # Returns a new Routing, in which the given leg is excluded from the graph
+    def exclude_leg(self, from_city, to_city):
+        excluded_routing = self.deepleg_copy()
+    
+        leg = excluded_routing.matrix[from_city][to_city]
+        
+        excluded_routing.undecided.remove(leg)
+        excluded_routing.excluded.append(leg)
+        excluded_routing.remove_leg(from_city, to_city)
+        
+        return excluded_routing
+        
+    # Marks a leg as included in the graph.
+    def include_leg(self, from_city, to_city):
+        included_routing = self.deepleg_copy()
+        
+        leg = included_routing.matrix[from_city][to_city]
+        
+        included_routing.undecided.remove(leg)
+        included_routing.included.append(leg)
+        included_routing.add_leg(from_city, to_city)
+        
+        return included_routing
+        
+    # Removes a leg from the graph -- undecided/included/excluded status is unaffected.
     def remove_leg(self, from_city, to_city):
         self.matrix[from_city][to_city].exists = False
         
-    # Adds a leg to the graph
+    # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
     def add_leg(self, from_city, to_city):
         self.matrix[from_city][to_city].exists = True
     

@@ -133,3 +133,24 @@ h = tri_route.deepleg_copy()
 
 assert str(h) == str(tri_route)
 assert h.legs(existing_only = False) != tri_route.legs(existing_only = False)
+
+# Test including and excluding legs
+included = tri_route.include_leg(city_dict["a"], city_dict["b"])
+assert str(included.included) != str(tri_route.included)
+assert str(included) == \
+"""  a b c d
+a 0 1 0 1
+b 0 0 0 0
+c 0 0 0 0
+d 0 1 1 0"""
+
+excluded = included.exclude_leg(city_dict["d"], city_dict["b"])
+assert str(included.excluded) != str(excluded.excluded)  # gettin' kinda hard to read here...
+assert str(excluded) == \
+"""  a b c d
+a 0 1 0 1
+b 0 0 0 0
+c 0 0 0 0
+d 0 0 1 0"""
+assert excluded.is_valid(tickets) == True
+assert excluded.cost(1.0, 0.2, tickets) == 1.0 * (math.sqrt(5) + 1 + math.sqrt(2)) + 0.2 * 3
