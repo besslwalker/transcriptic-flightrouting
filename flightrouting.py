@@ -75,7 +75,13 @@ def make_city_dict(cities):
 
 # Recursively solves the flight routing problem.    
 def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
-    # pure branching solution, only bounds when out of choices
+    # Bounds when we already know a better solution.
+    if current_best != None:
+        best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)
+        if routing.cost(mile_cost, takeoff_cost, tickets) >= best_cost:
+            return current_best  # Since this one can't do better.
+    
+    # We've run out of choices.  Update current_best if necessary, then return it.
     if len(routing.undecided) == 0:
         if routing.is_valid(tickets):
             cost = routing.cost(mile_cost, takeoff_cost, tickets)
