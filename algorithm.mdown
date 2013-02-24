@@ -11,10 +11,17 @@ Since an optimal solution is required, a heuristic isn't good enough: a branch-a
 
 The routing produced by the greedy algorithm briefly described above provides a reasonable starting upper bound.
 
-### Brute-force branching -- suitable only for small examples, but shakes out I/O and verification issues
+### Brute-force branching -- suitable only for very small examples, but shakes out I/O and verification issues
 
-0. The cost of the current known-best solution is Inf.
+0. The current best-known solution is None.
 
 1. Use recursive branching to generate all possible INCLUDED / EXCLUDED combinations of legs.
   - when no UNDECIDED legs remain, evaluate the resulting graph: are all required cities reachable?
-  - if the graph is valid, calculate the cost; if it is better than the known-best solution, it becomes the known-best solution.
+  - if the graph is valid, calculate the cost; if it is better than the best-known solution, it becomes the best-known solution.
+
+(In my implementation, this was only reasonably timed for three or fewer cities.)
+
+### Basic improvements - bounding, etc.
+
+- Don't bother considering self-loop edges at all; start 'em out as EXCLUDED.
+- If the current graph has a cost >= the best-known graph's cost, bail.
