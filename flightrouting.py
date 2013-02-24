@@ -2,6 +2,7 @@
 # Bess L. Walker
 # 2-22-13
 
+import sys
 import routing
 
 # File I/O
@@ -100,5 +101,23 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     current_best = solve(included, tickets, mile_cost, takeoff_cost, current_best)
     
     return current_best
+    
+def main(args):
+    if len(args) != 3:
+        print "  Usage: flightrouting.py <city_file> <ticket_file>\n"
+    
+    city_file = args[1]
+    ticket_file = args[2]
+    
+    cities = load_cities(city_file)
+    tickets = load_tickets(ticket_file, make_city_dict(cities))
+    
+    unrouted = routing.Routing(cities).exclude_selfloops()
+    solution = solve(unrouted, tickets, 1.0, 2.0)
+    
+    return solution
+    
+if __name__ == "__main__":
+    main(sys.argv)
             
         
