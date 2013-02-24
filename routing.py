@@ -117,6 +117,14 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
+    # Removes a leg from the graph -- undecided/included/excluded status is unaffected.
+    def remove_leg(self, from_city, to_city):
+        self.matrix[from_city][to_city].exists = False
+        
+    # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
+    def add_leg(self, from_city, to_city):
+        self.matrix[from_city][to_city].exists = True
+    
     # Returns a new Routing, in which the given leg is excluded from the graph
     def exclude_leg(self, from_city, to_city):
         excluded_routing = self.deepleg_copy()
@@ -128,6 +136,20 @@ class Routing:
         excluded_routing.remove_leg(from_city, to_city)
         
         return excluded_routing
+   
+    # Returns a new Routing in which all the a->a edges are excluded from the graph     
+    def exclude_selfloops(self):
+        new_routing = self.deepleg_copy()
+        
+        for city in new_routing.sorted_cities():
+            loop_leg = new_routing.matrix[city][city]
+            
+            new_routing.undecided.remove(loop_leg)
+            new_routing.excluded.append(loop_leg)
+            new_routing.remove_leg(city, city)
+            
+        return new_routing
+        
         
     # Marks a leg as included in the graph.
     def include_leg(self, from_city, to_city):
@@ -141,14 +163,6 @@ class Routing:
         
         return included_routing
         
-    # Removes a leg from the graph -- undecided/included/excluded status is unaffected.
-    def remove_leg(self, from_city, to_city):
-        self.matrix[from_city][to_city].exists = False
-        
-    # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
-    def add_leg(self, from_city, to_city):
-        self.matrix[from_city][to_city].exists = True
-    
     # Returns a list of legs, by default only those which exist.
     # Warning: setting existing_only to False will return a list that's n**2 in the number of cities.    
     def legs(self, existing_only = True):
