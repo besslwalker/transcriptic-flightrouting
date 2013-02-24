@@ -1,0 +1,5 @@
+from_city_id    to_city_id
+a               c
+b               d
+b               e
+c               e

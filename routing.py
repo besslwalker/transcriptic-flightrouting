@@ -117,35 +117,40 @@ class Routing:
     def sorted_cities(self):
         return sorted(self.matrix.keys(), key = lambda city: city.id)
         
-    # Removes a leg from the graph -- undecided/included/excluded status is unaffected.
+    # Removes a leg from the graph, also excluding it
     def remove_leg(self, from_city, to_city):
-        self.matrix[from_city][to_city].exists = False
+        leg = self.matrix[from_city][to_city]
+        
+        leg.exists = False
+        if leg in self.undecided:
+            self.undecided.remove(leg)
+        self.excluded.append(leg)
         
     # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
     def add_leg(self, from_city, to_city):
-        self.matrix[from_city][to_city].exists = True
+        leg = self.matrix[from_city][to_city]
+        
+        leg.exists = True
+        if leg in self.undecided:
+            self.undecided.remove(leg)
+        self.included.append(leg)
+        
     
     # Returns a new Routing, in which the given leg is excluded from the graph
+    # and any consequences are also realized
     def exclude_leg(self, from_city, to_city):
         excluded_routing = self.deepleg_copy()
     
-        leg = excluded_routing.matrix[from_city][to_city]
-        
-        excluded_routing.undecided.remove(leg)
-        excluded_routing.excluded.append(leg)
         excluded_routing.remove_leg(from_city, to_city)
         
         return excluded_routing
    
-    # Returns a new Routing in which all the a->a edges are excluded from the graph     
+    # Returns a new Routing in which all the a->a edges are excluded from the graph 
+    # and any consequences are realized    
     def exclude_selfloops(self):
         new_routing = self.deepleg_copy()
         
         for city in new_routing.sorted_cities():
-            loop_leg = new_routing.matrix[city][city]
-            
-            new_routing.undecided.remove(loop_leg)
-            new_routing.excluded.append(loop_leg)
             new_routing.remove_leg(city, city)
             
         return new_routing
@@ -155,10 +160,6 @@ class Routing:
     def include_leg(self, from_city, to_city):
         included_routing = self.deepleg_copy()
         
-        leg = included_routing.matrix[from_city][to_city]
-        
-        included_routing.undecided.remove(leg)
-        included_routing.included.append(leg)
         included_routing.add_leg(from_city, to_city)
         
         return included_routing
