@@ -27,3 +27,22 @@ The routing produced by the greedy algorithm briefly described above provides a 
 - If the current graph has a cost >= the best-known graph's cost, bail.
 
 (This improvments allow reasonable timing for five or fewer cities.)
+
+### Polynomial time improvements based on shared cities.
+
+(I consulted my advisor, who likes to play with algorithms.  These are all his ideas -- he got back to me really quickly before I even started thinking about the problem much!)
+
+> Specifically, any time you include two edges that share a vertex, you can exclude another edge (and this effect should grow geometrically as you add edges -- you just need to make sure to add them in a good order.)
+
+> Consider:
+
+> 1: If you have A->B and B->C included, you can exclude A->C since that path is already available given the current set of flights.  In fact, you would actually mark it as "implicitly included" to simplify subsequent optimizations.
+
+> 2: If you have A->B and A->C then you can exclude BOTH B->C and C->B.  Why?  Because if they were added then one of the original edges would become redundant, and the branching process works such that once you include something, that path can only lead to solutions that keep that edge included.  Furthermore, any addition that would have made B->C or C->B at all possible can be excluded, and if either of these paths is a ticket you can backtrack right now.
+
+> 2b: Point number 2 has an interesting corollary.  Since we know all ticketed paths must be possible, if you have ticked path X->Y, then you cannot have both A->X and A->Y directly in the answer set.  If you did, you wouldn't need the A->Y because there would have been another route to go.  Ahh... the one exception to this rule is if the X->Y path goes through A.  So what this says is that it is easier to make rules about DIRECT paths.  OR indirect paths that are already included since we'll know what else they go through.
+
+> 3: The opposite of point 2 also holds.  That is, if you have A->C and B->C then you can exclude BOTH A->B and B->A since they would each make one of the existing paths redundant.
+
+> That covers all of the possibilities for when two included edges share a vertex.
+
