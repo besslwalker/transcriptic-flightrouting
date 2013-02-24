@@ -1,4 +1,4 @@
-# Implementation of toy problem for Transcriptic
+# Data structures for toy problem
 # Bess L. Walker
 # 2-22-13
 

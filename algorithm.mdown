@@ -25,3 +25,5 @@ The routing produced by the greedy algorithm briefly described above provides a 
 
 - Don't bother considering self-loop edges at all; start 'em out as EXCLUDED.
 - If the current graph has a cost >= the best-known graph's cost, bail.
+
+(This improvments allow reasonable timing for five or fewer cities.)
