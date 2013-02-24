@@ -154,3 +154,43 @@ c 0 0 0 0
 d 0 0 1 0"""
 assert excluded.is_valid(tickets) == True
 assert excluded.cost(1.0, 0.2, tickets) == 1.0 * (math.sqrt(5) + 1 + math.sqrt(2)) + 0.2 * 3
+
+# Test solver
+best = flightrouting.solve(routing.Routing([]), [], 1.0, 0.2)
+assert str(best) == " "
+
+one_city = flightrouting.load_cities("1_city.csv")
+best = flightrouting.solve(routing.Routing(one_city), [], 1.0, 0.2)
+assert str(best) == \
+"""  c
+c 0"""
+d = flightrouting.make_city_dict(one_city)
+best = flightrouting.solve(routing.Routing(one_city), [routing.Ticket(d["c"], d["c"])], 1.0, 0.2)
+assert str(best) == \
+"""  c
+c 0"""
+
+three_cities = flightrouting.load_cities("3_cities.csv")
+d = flightrouting.make_city_dict(three_cities)
+
+best = flightrouting.solve(routing.Routing(three_cities), [], 1.0, 0.2)
+assert str(best) == \
+"""  a b c
+a 0 0 0
+b 0 0 0
+c 0 0 0"""
+
+best = flightrouting.solve(routing.Routing(three_cities), [routing.Ticket(d["a"], d["c"])], 1.0, 0.2)
+assert str(best) == \
+"""  a b c
+a 0 0 1
+b 0 0 0
+c 0 0 0"""
+
+best = flightrouting.solve(routing.Routing(three_cities), [routing.Ticket(d["a"], d["c"]), routing.Ticket(d["a"], d["b"])], 1.0, 0.2)
+assert str(best) == \
+"""  a b c
+a 0 0 1
+b 0 0 0
+c 0 1 0"""
+

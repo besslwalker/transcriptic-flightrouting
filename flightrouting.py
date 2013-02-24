@@ -72,3 +72,27 @@ def make_city_dict(cities):
         city_dict[city.id] = city
         
     return city_dict
+
+# Recursively solves the flight routing problem.    
+def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
+    # pure branching solution, only bounds when out of choices
+    if len(routing.undecided) == 0:
+        if routing.is_valid(tickets):
+            cost = routing.cost(mile_cost, takeoff_cost, tickets)
+            if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
+                current_best = routing
+        return current_best
+            
+    branch_leg = routing.undecided.pop()
+    
+    # EXCLUSION
+    excluded = routing.exclude_leg(branch_leg.from_city, branch_leg.to_city)
+    current_best = solve(excluded, tickets, mile_cost, takeoff_cost, current_best)
+    
+    # INCLUSION
+    included = routing.include_leg(branch_leg.from_city, branch_leg.to_city)
+    current_best = solve(included, tickets, mile_cost, takeoff_cost, current_best)
+    
+    return current_best
+            
+        
