@@ -93,6 +93,10 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
             return current_best
         else:
             return routing
+            
+    # If we only have one ticket, we simply use the direct route.
+    if len(tickets) == 1 and tickets[0].from_city != tickets[0].to_city:
+        return routing.include_leg(tickets[0].from_city, tickets[0].to_city)
         
     # Backtracks when we've ruled out a ticket's route
     for ticket in tickets:
