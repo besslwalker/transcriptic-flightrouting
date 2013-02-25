@@ -146,7 +146,7 @@ c 0 0 0 0
 d 0 1 1 0"""
 
 excluded = included.exclude_leg(city_dict["d"], city_dict["b"])
-assert str(included.excluded) != str(excluded.excluded)  # gettin' kinda hard to read here...
+assert str(tri_route.excluded) != str(excluded.excluded)  # gettin' kinda hard to read here...
 assert str(excluded) == \
 """  a b c d
 a 0 1 0 1
