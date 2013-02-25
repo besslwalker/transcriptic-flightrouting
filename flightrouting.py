@@ -118,7 +118,7 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     if current_best != None:
         best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)
         routing_cost = routing.cost(mile_cost, takeoff_cost, tickets)
-        if routing_cost + branch_leg.miles * mile_cost + takeoff_cost >= best_cost:
+        if routing_cost + (branch_leg.miles * mile_cost) + takeoff_cost >= best_cost:
             return current_best  # Adding this leg can't do any better
     
     included = routing.include_leg(branch_leg.from_city, branch_leg.to_city)
@@ -139,7 +139,7 @@ def main(args):
     
     unrouted = routing.Routing(cities).exclude_selfloops()
     current_best = unrouted.simple(tickets)
-    solution = solve(unrouted, tickets, 1.0, 2.0, current_best)
+    solution = solve(unrouted, tickets, 1.0, 0.2, current_best)
     
     return solution
     
