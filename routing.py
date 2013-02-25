@@ -72,6 +72,7 @@ class Routing:
         self.included  = set()
         self.excluded  = set()
         self.implicitly_included = set()
+        self.explicitly_excluded = set()
     
     # Creates a copy with independent Legs but not independent Cities.            
     def deepleg_copy(self):
@@ -93,6 +94,8 @@ class Routing:
                     new_routing.excluded.add(new_leg)
                     if leg in self.implicitly_included:
                         new_routing.implicitly_included.add(new_leg)
+                    if leg in self.explicitly_excluded:
+                        new_routing.explicitly_excluded.add(new_leg)
                 else:
                     new_routing.undecided.append(new_leg)
                     
@@ -198,31 +201,37 @@ class Routing:
                 # If from_city->C is included (or implicitly included)
                 # we can exclude C->to_city and to_city->C, since they would make from_city->to_city redundant.
                 # They are NOT implicitly included, however.
+                # In fact, no indirect connection corresponding to those legs should be allowed either,
+                # so we mark them unreachable.
                 C = A
                 leg = included_routing.matrix[from_city][C]
                 if leg in included_routing.included | included_routing.implicitly_included:
                     replacement_leg_1 = included_routing.matrix[C][to_city]
                     if replacement_leg_1 in included_routing.undecided:
                         included_routing.remove_leg(C, to_city)
+                        included_routing.explicitly_excluded.add(replacement_leg_1)
                     
                     replacement_leg_2 = included_routing.matrix[to_city][C]
                     if replacement_leg_2 in included_routing.undecided:
                         included_routing.remove_leg(to_city, C)
+                        included_routing.explicitly_excluded.add(replacement_leg_2)
                         
                 # Optimization 2b: exclude paths that would make this one redundant
                 # If D->to_city is included (or implicitly included)
                 # we can exclude from_city->D and D->from_city, since they would make from_city->to_city redundant.
-                # They are NOT implicitly included.
+                # And we mark them unreachable.
                 D = A
                 leg = included_routing.matrix[D][to_city]
                 if leg in included_routing.included | included_routing.implicitly_included:
                     replacement_leg_1 = included_routing.matrix[from_city][D]
                     if replacement_leg_1 in included_routing.undecided:
                         included_routing.remove_leg(from_city, D)
+                        included_routing.explicitly_excluded.add(replacement_leg_1)
                     
                     replacement_leg_2 = included_routing.matrix[D][from_city]
                     if replacement_leg_2 in included_routing.undecided:
                         included_routing.remove_leg(D, from_city)
+                        included_routing.explicitly_excluded.add(replacement_leg_2)
     
         return included_routing
         
