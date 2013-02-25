@@ -99,14 +99,14 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
             return current_best  # Since this one can't do better.
     
     # We've run out of choices.  Update current_best if necessary, then return it.
-    if len(routing.undecided) == 0:
+    if len(routing.undecided_legs()) == 0:
         if routing.is_valid(tickets):
             cost = routing.cost(mile_cost, takeoff_cost, tickets)
             if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
                 current_best = routing
         return current_best
             
-    branch_leg = routing.undecided.pop()
+    branch_leg = routing.undecided_legs()[0]
     
     # EXCLUSION
     excluded = routing.exclude_leg(branch_leg.from_city, branch_leg.to_city)

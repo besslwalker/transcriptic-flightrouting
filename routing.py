@@ -32,6 +32,12 @@ class Leg:
         self.from_city = from_city
         self.to_city   = to_city
         self.exists    = exists
+        
+        self.undecided = True
+        self.included  = False
+        self.excluded  = False
+        self.implicitly_included = False
+        self.explicitly_excluded = False
                 
         self.miles = from_city.distance_to(to_city)
         
@@ -68,13 +74,7 @@ class Routing:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
         self.cities = sorted(self.matrix.keys(), key = lambda city: city.id)
-     
-        self.undecided = self.legs(existing_only = False)
-        self.included  = set()
-        self.excluded  = set()
-        self.implicitly_included = set()
-        self.explicitly_excluded = set()
-    
+         
     # Creates a copy with independent Legs but not independent Cities.            
     def deepleg_copy(self):
         cities = self.sorted_cities()
@@ -86,19 +86,7 @@ class Routing:
             for to_city in cities:
                 leg = self.matrix[from_city][to_city]
                 new_routing.matrix[from_city][to_city] = copy.copy(leg)
-                new_leg = new_routing.matrix[from_city][to_city]
-                    
-                if leg in self.included:
-                    new_routing.included.add(new_leg)
-                elif leg in self.excluded:
-                    new_routing.excluded.add(new_leg)
-                    if leg in self.implicitly_included:
-                        new_routing.implicitly_included.add(new_leg)
-                    if leg in self.explicitly_excluded:
-                        new_routing.explicitly_excluded.add(new_leg)
-                else:
-                    new_routing.undecided.append(new_leg)
-                    
+                                        
         return new_routing
                 
     def __repr__(self):
@@ -130,33 +118,32 @@ class Routing:
         leg = self.matrix[from_city][to_city]
         
         leg.exists = False
-        if leg in self.undecided:
-            self.undecided.remove(leg)
-        self.included.discard(leg)
-        self.excluded.add(leg)
-        
+        if leg.undecided:
+            leg.undecided = False
+        leg.included = False
+        leg.excluded = True
+                
     # Adds a leg to the graph
     def add_leg(self, from_city, to_city):
         leg = self.matrix[from_city][to_city]
         
         leg.exists = True
-        if leg in self.undecided:
-            self.undecided.remove(leg)
-        self.excluded.discard(leg)
-        self.included.add(leg)
-        
+        if leg.undecided:
+            leg.undecided = False
+        leg.excluded = False
+        leg.included = True
+                
     # REMOVES a leg from the graph, excluding it, but marks it as implicitly included
     # i.e. to_city is reachable from from_city, just not directly.
     def add_implicit_leg(self, from_city, to_city):
         self.remove_leg(from_city, to_city)
-        self.implicitly_included.add(self.matrix[from_city][to_city])
+        self.matrix[from_city][to_city].implicitly_included = True
         
     # Removes a leg from the graph, excluding it AND marking it explicitly excluded
     # i.e. no indirect path is possible either
     def remove_explicit_leg(self, from_city, to_city):
         self.remove_leg(from_city, to_city)
-        self.explicitly_excluded.add(self.matrix[from_city][to_city])
-        
+        self.matrix[from_city][to_city].explicitly_excluded = True        
     
     # Returns a new Routing in which all the a->a edges are excluded from the graph 
     # and any consequences are realized    
@@ -191,8 +178,8 @@ class Routing:
                 # we can exclude A->to_city, since A->from_city->to_city is now a path.
                 # And we mark it implicitly included.
                 leg = included_routing.matrix[A][from_city]
-                if leg in included_routing.included | included_routing.implicitly_included:
-                    if included_routing.matrix[A][to_city] in included_routing.undecided:
+                if leg.included or leg.implicitly_included:
+                    if included_routing.matrix[A][to_city].undecided:
                         included_routing.add_implicit_leg(A, to_city)
                 
                 # Optimization 1b: exclude redundant paths from from_city
@@ -201,8 +188,8 @@ class Routing:
                 # And we mark it implicitly included.
                 B = A
                 leg = included_routing.matrix[to_city][B]
-                if leg in included_routing.included | included_routing.implicitly_included:
-                    if included_routing.matrix[from_city][B] in included_routing.undecided:
+                if leg.included or leg.implicitly_included:
+                    if included_routing.matrix[from_city][B].undecided:
                         included_routing.add_implicit_leg(from_city, B)
                         
                 # Optimization 2a: exclude paths that would make this one redundant
@@ -213,11 +200,11 @@ class Routing:
                 # so we mark them unreachable.
                 C = A
                 leg = included_routing.matrix[from_city][C]
-                if leg in included_routing.included | included_routing.implicitly_included:
-                    if included_routing.matrix[C][to_city] in included_routing.undecided:
+                if leg.included or leg.implicitly_included:
+                    if included_routing.matrix[C][to_city].undecided:
                         included_routing.remove_explicit_leg(C, to_city)
                     
-                    if included_routing.matrix[to_city][C] in included_routing.undecided:
+                    if included_routing.matrix[to_city][C].undecided:
                         included_routing.remove_explicit_leg(to_city, C)
                         
                 # Optimization 2b: exclude paths that would make this one redundant
@@ -226,11 +213,11 @@ class Routing:
                 # And we mark them unreachable.
                 D = A
                 leg = included_routing.matrix[D][to_city]
-                if leg in included_routing.included | included_routing.implicitly_included:
-                    if included_routing.matrix[from_city][D] in included_routing.undecided:
+                if leg.included or leg.implicitly_included:
+                    if included_routing.matrix[from_city][D].undecided:
                         included_routing.remove_explicit_leg(from_city, D)
                     
-                    if included_routing.matrix[D][from_city] in included_routing.undecided:
+                    if included_routing.matrix[D][from_city].undecided:
                         included_routing.remove_explicit_leg(D, from_city)
     
         return included_routing
@@ -246,12 +233,16 @@ class Routing:
             return [leg for leg in legs if leg.exists]
         else:
             return legs
+            
+    # Returns a list of undecided legs
+    def undecided_legs(self):
+        return [leg for leg in self.legs(existing_only = False) if leg.undecided]
         
     # Returns True if the route from from_city to to_city is marked explicitly excluded
     # i.e. impossible.
     def explicitly_excludes(self, from_city, to_city):
         leg = self.matrix[from_city][to_city]
-        if leg in self.explicitly_excluded:
+        if leg.explicitly_excluded:
             return True
             
         return False
@@ -264,11 +255,11 @@ class Routing:
         for ticket in tickets:
             # Take advantage of what we know
             ticket_leg = self.matrix[ticket.from_city][ticket.to_city]
-            if ticket_leg in self.included | self.implicitly_included:
+            if ticket_leg.included or ticket_leg.implicitly_included:
                 # Hurrah, it's satisfied, we can check the next ticket.
                 continue
                 
-            if ticket_leg in self.explicitly_excluded:
+            if ticket_leg.explicitly_excluded:
                 # Well, we can't get there from here -- this isn't valid!
                 return False
             

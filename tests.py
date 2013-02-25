@@ -42,7 +42,7 @@ assert str(g.legs()) == "[<Leg:b->a>]"
 g.remove_leg(p2, p1)
 g.remove_leg(p1, p2)
 assert g.legs() == []
-assert g.included == set()
+#assert g.included == set()  # g no longer has .included
 
 # Check __repr__ and __str__ methods for Routing
 assert repr(g) == "<Routing:a,b>"
@@ -137,7 +137,7 @@ assert h.legs(existing_only = False) != tri_route.legs(existing_only = False)
 
 # Test including and excluding legs
 included = tri_route.include_leg(city_dict["a"], city_dict["b"])
-assert str(included.included) != str(tri_route.included)
+#assert str(included.included) != str(tri_route.included)  # Routing no longer has .included
 assert str(included) == \
 """  a b c d
 a 0 1 0 1
@@ -146,7 +146,7 @@ c 0 0 0 0
 d 0 1 1 0"""
 
 excluded = included.exclude_leg(city_dict["d"], city_dict["b"])
-assert str(tri_route.excluded) != str(excluded.excluded)  # gettin' kinda hard to read here...
+#assert str(tri_route.excluded) != str(excluded.excluded)  # Routing no longer has .excluded
 assert str(excluded) == \
 """  a b c d
 a 0 1 0 1
