@@ -47,3 +47,8 @@ The routing produced by the greedy algorithm briefly described above provides a 
 
 > That covers all of the possibilities for when two included edges share a vertex.
 
+### Polynomial time improvements based on required origins & destinations
+
+4a. If B is the destination of some ticket, and excluding A->B leaves only C->B as a possible path to B, we must include C->B.
+
+4b. If A is the origin of some ticket, and excluding A->B leaves only A->C as a possible path from A, we must include A->C.
