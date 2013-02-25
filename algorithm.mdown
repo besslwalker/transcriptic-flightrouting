@@ -25,8 +25,8 @@ The routing produced by the greedy algorithm briefly described above provides a 
 
 - Don't bother considering self-loop edges at all; start 'em out as EXCLUDED.
 - If the current graph has a cost >= the best-known graph's cost, bail.
-
-(This improvments allow reasonable timing for five or fewer cities.)
+- If including the branching edge brings the cost over the best known, don't try that branch.
+- Start the current-best solution with a simple take-all-the-tickets graph, as an upper bound.
 
 ### Polynomial time improvements based on shared cities.
 
