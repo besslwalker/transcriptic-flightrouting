@@ -68,12 +68,13 @@ class Routing:
         self.init_from_list(city_list)
                 
     def init_from_list(self, city_list):
+        self.cities = sorted(city_list, key = lambda city: city.id)
+
         self.matrix = defaultdict(dict)
-        for from_city in city_list:
-            for to_city in city_list:
+        for from_city in self.cities:
+            for to_city in self.cities:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
-        self.cities = sorted(self.matrix.keys(), key = lambda city: city.id)
          
     # Creates a copy with independent Legs but not independent Cities.            
     def deepleg_copy(self):
