@@ -215,3 +215,9 @@ b 0 0 1 0 0
 c 0 0 0 1 0
 d 0 0 0 0 1
 e 0 0 0 0 0"""
+
+# Test ticket de-duplicator
+dup_tickets = flightrouting.load_tickets("dup_tickets.csv", flightrouting.make_city_dict(tri_cities))
+assert repr(dup_tickets) == "[<Ticket:a->b>, <Ticket:a->c>, <Ticket:a->b>]"
+deduped_tickets = flightrouting.dedup_tickets(dup_tickets)
+assert repr(deduped_tickets) == "[<Ticket:a->b>, <Ticket:a->c>]"

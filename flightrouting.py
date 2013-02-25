@@ -73,6 +73,17 @@ def make_city_dict(cities):
         city_dict[city.id] = city
         
     return city_dict
+    
+# Returns a list of Tickets, sans duplicates
+def dedup_tickets(tickets):
+    deduped_tickets = []
+    ticket_reprs = []
+    for ticket in tickets:
+        if not repr(ticket) in ticket_reprs:
+            deduped_tickets.append(ticket)
+            ticket_reprs.append(repr(ticket))
+            
+    return deduped_tickets
 
 # Recursively solves the flight routing problem.    
 def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
@@ -110,7 +121,8 @@ def main(args):
     ticket_file = args[2]
     
     cities = load_cities(city_file)
-    tickets = load_tickets(ticket_file, make_city_dict(cities))
+    all_tickets = load_tickets(ticket_file, make_city_dict(cities))
+    tickets = dedup_tickets(all_tickets)  # removes duplicates; they affect nothing.
     
     unrouted = routing.Routing(cities).exclude_selfloops()
     solution = solve(unrouted, tickets, 1.0, 2.0)
