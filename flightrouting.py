@@ -115,9 +115,10 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     if len(undecided_legs) == 0:
         if routing.is_valid(tickets):
             cost = routing.cost(mile_cost, takeoff_cost, tickets)
-            print routing, cost
             if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
                 current_best = routing
+        else:
+            print routing
         return current_best
             
     branch_leg = undecided_legs[-1]
