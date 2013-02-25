@@ -170,24 +170,23 @@ class Routing:
         included_routing.add_leg(from_city, to_city)
         
         if from_city != to_city:
-        
-            # Optimization 1a: exclude redundant paths to to_city
-            # If A->from_city is included (or implicitly included)
-            # we can stop considering A->to_city, since A->from_city->to_city is now a path.
-            # And we mark it implicitly included.
             for A in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
+                # Optimization 1a: exclude redundant paths to to_city
+                # If A->from_city is included (or implicitly included)
+                # we can stop considering A->to_city, since A->from_city->to_city is now a path.
+                # And we mark it implicitly included.
                 leg = included_routing.matrix[A][from_city]
                 if leg in included_routing.included | included_routing.implicitly_included:
                     redundant_leg = included_routing.matrix[A][to_city]
                     if redundant_leg in included_routing.undecided:
                         included_routing.remove_leg(A, to_city)
                         included_routing.implicitly_included.add(included_routing.matrix[A][to_city])
-            
-            # Optimization 1b: exclude redundant paths from from_city
-            # If to_city->B is included (or implicitly included)
-            # we can stop considering from_city->B, since from_city->to_city->B is now a path.
-            # And we mark it implicitly included.
-            for B in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
+                
+                # Optimization 1b: exclude redundant paths from from_city
+                # If to_city->B is included (or implicitly included)
+                # we can stop considering from_city->B, since from_city->to_city->B is now a path.
+                # And we mark it implicitly included.
+                B = A
                 leg = included_routing.matrix[to_city][B]
                 if leg in included_routing.included | included_routing.implicitly_included:
                     redundant_leg = included_routing.matrix[from_city][B]
