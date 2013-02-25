@@ -4,6 +4,7 @@
 
 import math
 from collections import deque
+from collections import defaultdict
 
 # The vertices in our graph are Cities, consisting of an id, x coordinate, and y coordinate.
 class City:
@@ -60,9 +61,8 @@ class Routing:
         self.init_from_list(city_list)
                 
     def init_from_list(self, city_list):
-        self.matrix = {}
+        self.matrix = defaultdict(dict)
         for from_city in city_list:
-            self.matrix[from_city] = {}
             for to_city in city_list:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
