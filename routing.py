@@ -66,6 +66,8 @@ class Routing:
             for to_city in city_list:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
+        self.cities = sorted(self.matrix.keys(), key = lambda city: city.id)
+     
         self.undecided = self.legs(existing_only = False)
         self.included  = set()
         self.excluded  = set()
@@ -118,7 +120,7 @@ class Routing:
     # Returns a list of the cities in the graph, sorted by id   
     # Mostly useful to enforce an order so that output is consistent. 
     def sorted_cities(self):
-        return sorted(self.matrix.keys(), key = lambda city: city.id)
+        return self.cities
         
     # Removes a leg from the graph, also excluding it
     def remove_leg(self, from_city, to_city):
