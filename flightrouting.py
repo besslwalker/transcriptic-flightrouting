@@ -97,16 +97,19 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
         best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)
         if routing.cost(mile_cost, takeoff_cost, tickets) >= best_cost:
             return current_best  # Since this one can't do better.
+            
+    undecided_legs = sorted(routing.undecided_legs(), key = lambda leg: leg.miles)
     
     # We've run out of choices.  Update current_best if necessary, then return it.
-    if len(routing.undecided_legs()) == 0:
+    if len(undecided_legs) == 0:
         if routing.is_valid(tickets):
             cost = routing.cost(mile_cost, takeoff_cost, tickets)
+            print routing, cost
             if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
                 current_best = routing
         return current_best
             
-    branch_leg = routing.undecided_legs()[0]
+    branch_leg = undecided_legs[-1]
     
     # INCLUSION
     skip_inclusion = False
