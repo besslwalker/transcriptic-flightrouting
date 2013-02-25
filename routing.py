@@ -135,7 +135,7 @@ class Routing:
         self.included.discard(leg)
         self.excluded.add(leg)
         
-    # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
+    # Adds a leg to the graph
     def add_leg(self, from_city, to_city):
         leg = self.matrix[from_city][to_city]
         
@@ -144,6 +144,12 @@ class Routing:
             self.undecided.remove(leg)
         self.excluded.discard(leg)
         self.included.add(leg)
+        
+    # REMOVES a leg from the graph, but marks it as implicitly included
+    # i.e. to_city is reachable from from_city, just not directly.
+    def add_implicit_leg(self, from_city, to_city):
+        self.remove_leg(from_city, to_city)
+        self.implicitly_included.add(self.matrix[from_city][to_city])
         
     
     # Returns a new Routing in which all the a->a edges are excluded from the graph 
@@ -182,8 +188,7 @@ class Routing:
                 if leg in included_routing.included | included_routing.implicitly_included:
                     redundant_leg = included_routing.matrix[A][to_city]
                     if redundant_leg in included_routing.undecided:
-                        included_routing.remove_leg(A, to_city)
-                        included_routing.implicitly_included.add(included_routing.matrix[A][to_city])
+                        included_routing.add_implicit_leg(A, to_city)
                 
                 # Optimization 1b: exclude redundant paths from from_city
                 # If to_city->B is included (or implicitly included)
@@ -194,8 +199,7 @@ class Routing:
                 if leg in included_routing.included | included_routing.implicitly_included:
                     redundant_leg = included_routing.matrix[from_city][B]
                     if redundant_leg in included_routing.undecided:
-                        included_routing.remove_leg(from_city, B)
-                        included_routing.implicitly_included.add(redundant_leg)
+                        included_routing.add_implicit_leg(from_city, B)
                         
                 # Optimization 2a: exclude paths that would make this one redundant
                 # If from_city->C is included (or implicitly included)
