@@ -310,13 +310,18 @@ class Routing:
     def cost(self, mile_cost, takeoff_cost, tickets):
         legs = self.legs()
         miles = sum([leg.miles for leg in legs])
-        
-        # The number of takeoffs is the same as the number of cities with IN edges
-        to_cities = [leg.to_city for leg in legs]
-        deduped_to_cities = set(to_cities)
-        takeoffs = len(deduped_to_cities)
-        
+        takeoffs = len(legs)
+                
         return miles * mile_cost + takeoffs * takeoff_cost
+        
+    # Returns a new Routing holding a simple solution to the problem: just take all the ticket legs.
+    def simple(self, tickets):
+        simple_routing = Routing(self.sorted_cities())
+        
+        for ticket in tickets:
+            simple_routing.add_leg(ticket.from_city, ticket.to_city)
+            
+        return simple_routing
         
         
             

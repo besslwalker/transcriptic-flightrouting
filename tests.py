@@ -208,9 +208,6 @@ d 0 1 1 0"""
 
 # Test five cities
 best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
-print best
-print best.included
-print best.implicitly_included
 assert str(best) == \
 """  a b c d e
 a 0 1 0 0 0
@@ -224,3 +221,24 @@ dup_tickets = flightrouting.load_tickets("dup_tickets.csv", flightrouting.make_c
 assert repr(dup_tickets) == "[<Ticket:a->b>, <Ticket:a->c>, <Ticket:a->b>]"
 deduped_tickets = flightrouting.dedup_tickets(dup_tickets)
 assert repr(deduped_tickets) == "[<Ticket:a->b>, <Ticket:a->c>]"
+
+# Test simple heuristic (just take the tickets)
+simple = routing.Routing(tri_cities).simple(tri_tickets)
+assert str(simple) == \
+"""  a b c d
+a 0 1 1 0
+b 0 0 0 0
+c 0 0 0 0
+d 0 0 0 0"""
+
+# Test six cities
+# best = flightrouting.main(["flightrouting.py", "six_cities.csv", "vee_tickets.csv"])
+# print best
+# assert str(best) == \
+# """  a b c d e f
+# a 0 0 1 0 0 0
+# b 0 0 0 0 0 0
+# c 0 0 0 1 0 0
+# d 0 1 1 0 0 1
+# e 0 0 1 0 0 0
+# f 0 0 0 0 0 0"""
