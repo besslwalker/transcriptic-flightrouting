@@ -69,6 +69,7 @@ class Routing:
         self.undecided = self.legs(existing_only = False)
         self.included  = []
         self.excluded  = []
+        self.implicitly_included = []
     
     # Creates a copy with independent Legs but not independent Cities.            
     def deepleg_copy(self):
@@ -88,6 +89,8 @@ class Routing:
                     new_routing.included.append(new_leg)
                 elif leg in self.excluded:
                     new_routing.excluded.append(new_leg)
+                    if leg in self.implicitly_included:
+                        new_routing.implicitly_included.append(new_leg)
                 else:
                     new_routing.undecided.append(new_leg)
                     
@@ -136,15 +139,6 @@ class Routing:
         self.included.append(leg)
         
     
-    # Returns a new Routing, in which the given leg is excluded from the graph
-    # and any consequences are also realized
-    def exclude_leg(self, from_city, to_city):
-        excluded_routing = self.deepleg_copy()
-    
-        excluded_routing.remove_leg(from_city, to_city)
-        
-        return excluded_routing
-   
     # Returns a new Routing in which all the a->a edges are excluded from the graph 
     # and any consequences are realized    
     def exclude_selfloops(self):
@@ -155,13 +149,42 @@ class Routing:
             
         return new_routing
         
+    # Returns a new Routing, in which the given leg is excluded from the graph
+    # and any consequences are also realized
+    def exclude_leg(self, from_city, to_city):
+        excluded_routing = self.deepleg_copy()
+    
+        excluded_routing.remove_leg(from_city, to_city)
         
-    # Marks a leg as included in the graph.
+        return excluded_routing
+   
+    # Returns a new Routing, in which the given leg is included in the graph
+    # and any consequences are also realized
     def include_leg(self, from_city, to_city):
         included_routing = self.deepleg_copy()
         
         included_routing.add_leg(from_city, to_city)
         
+        # Optimization 1a: exclude redundant paths to to_city
+        # If A->from_city is included (or implicitly included)
+        # we can stop considering A->to_city, since A->from_city->to_city is now a path.
+        # And we mark it implicitly included.
+#         for A in included_routing.sorted_cities():
+#             leg = included_routing.matrix[A][from_city]
+#             if leg in included_routing.included + included_routing.implicitly_included:
+#                 included_routing.remove_leg(A, to_city)
+#                 included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
+        
+        # Optimization 1b: exclude redundant paths from from_city
+        # If to_city->B is included (or implicitly included)
+        # we can stop considering from_city->B, since from_city->to_city->B is now a path.
+        # And we mark it implicitly included.
+        for B in included_routing.sorted_cities():
+            leg = included_routing.matrix[to_city][B]
+            if leg in included_routing.included + included_routing.implicitly_included:
+                included_routing.remove_leg(from_city, B)
+                included_routing.implicitly_included.append(included_routing.matrix[from_city][B])
+    
         return included_routing
         
     # Returns a list of legs, by default only those which exist.
