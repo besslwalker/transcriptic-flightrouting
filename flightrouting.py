@@ -87,6 +87,11 @@ def dedup_tickets(tickets):
 
 # Recursively solves the flight routing problem.    
 def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
+    # Backtracks when we've ruled out a ticket's route
+    for ticket in tickets:
+        if routing.explicitly_excludes(ticket.from_city, ticket.to_city):
+            return current_best  # This certainly isn't better, it doesn't even work!
+
     # Bounds when we already know a better solution.
     if current_best != None:
         best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)

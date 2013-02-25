@@ -249,6 +249,15 @@ class Routing:
             
         return legs
         
+    # Returns True if the route from from_city to to_city is marked explicitly excluded
+    # i.e. impossible.
+    def explicitly_excludes(self, from_city, to_city):
+        leg = self.matrix[from_city][to_city]
+        if leg in self.explicitly_excluded:
+            return True
+            
+        return False
+        
     # Returns True if routes satisfying all tickets exist.  
     # Currently implemented naively.
     def is_valid(self, tickets):
@@ -260,6 +269,10 @@ class Routing:
             if ticket_leg in self.included | self.implicitly_included:
                 # Hurrah, it's satisfied, we can check the next ticket.
                 continue
+                
+            if ticket_leg in self.explicitly_excluded:
+                # Well, we can't get there from here -- this isn't valid!
+                return False
             
             # Otherwise, determine reachability via BFS
             
