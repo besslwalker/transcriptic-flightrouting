@@ -108,10 +108,6 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
             
     branch_leg = routing.undecided_legs()[0]
     
-    # EXCLUSION
-    excluded = routing.exclude_leg(branch_leg.from_city, branch_leg.to_city)
-    current_best = solve(excluded, tickets, mile_cost, takeoff_cost, current_best)
-    
     # INCLUSION
     skip_inclusion = False
     
@@ -125,6 +121,10 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     if not skip_inclusion:
         included = routing.include_leg(branch_leg.from_city, branch_leg.to_city)
         current_best = solve(included, tickets, mile_cost, takeoff_cost, current_best)
+    
+    # EXCLUSION
+    excluded = routing.exclude_leg(branch_leg.from_city, branch_leg.to_city)
+    current_best = solve(excluded, tickets, mile_cost, takeoff_cost, current_best)
     
     return current_best
     
