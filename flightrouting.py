@@ -138,7 +138,8 @@ def main(args):
     tickets = dedup_tickets(all_tickets)  # removes duplicates; they affect nothing.
     
     unrouted = routing.Routing(cities).exclude_selfloops()
-    solution = solve(unrouted, tickets, 1.0, 2.0)
+    current_best = unrouted.simple(tickets)
+    solution = solve(unrouted, tickets, 1.0, 2.0, current_best)
     
     return solution
     
