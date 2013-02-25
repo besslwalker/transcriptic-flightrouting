@@ -238,16 +238,14 @@ class Routing:
     # Returns a list of legs, by default only those which exist.
     # Warning: setting existing_only to False will return a list that's n**2 in the number of cities.    
     def legs(self, existing_only = True):
-        legs = []
-        for from_city in self.sorted_cities():
-            from_legs = [self.matrix[from_city][to_city] for to_city in self.sorted_cities()]
-            if existing_only:
-                exist_legs = [leg for leg in from_legs if leg.exists]
-                legs += exist_legs
-            else:
-                legs += from_legs
-            
-        return legs
+        # "Incomprehensible list comprehension" to flatten the matrix, taken from 
+        # http://stackoverflow.com/questions/952914/making-a-flat-list-out-of-list-of-lists-in-python
+        legs = [leg for from_legs in self.matrix.values() for leg in from_legs.values()]
+        
+        if existing_only:
+            return [leg for leg in legs if leg.exists]
+        else:
+            return legs
         
     # Returns True if the route from from_city to to_city is marked explicitly excluded
     # i.e. impossible.
@@ -259,7 +257,7 @@ class Routing:
         return False
         
     # Returns True if routes satisfying all tickets exist.  
-    # Currently implemented naively.
+    # Uses what information it can, then falls back on a naive BFS.
     def is_valid(self, tickets):
         cities = self.sorted_cities()
         
