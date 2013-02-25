@@ -5,6 +5,7 @@
 import math
 from collections import deque
 from collections import defaultdict
+import copy
 
 # The vertices in our graph are Cities, consisting of an id, x coordinate, and y coordinate.
 class City:
@@ -31,7 +32,7 @@ class Leg:
         self.from_city = from_city
         self.to_city   = to_city
         self.exists    = exists
-        
+                
         self.miles = from_city.distance_to(to_city)
         
     def __repr__(self):
@@ -84,9 +85,8 @@ class Routing:
         for from_city in cities:
             for to_city in cities:
                 leg = self.matrix[from_city][to_city]
+                new_routing.matrix[from_city][to_city] = copy.copy(leg)
                 new_leg = new_routing.matrix[from_city][to_city]
-                if leg.exists:
-                    new_routing.add_leg(from_city, to_city)
                     
                 if leg in self.included:
                     new_routing.included.add(new_leg)
