@@ -145,11 +145,17 @@ class Routing:
         self.excluded.discard(leg)
         self.included.add(leg)
         
-    # REMOVES a leg from the graph, but marks it as implicitly included
+    # REMOVES a leg from the graph, excluding it, but marks it as implicitly included
     # i.e. to_city is reachable from from_city, just not directly.
     def add_implicit_leg(self, from_city, to_city):
         self.remove_leg(from_city, to_city)
         self.implicitly_included.add(self.matrix[from_city][to_city])
+        
+    # Removes a leg from the graph, excluding it AND marking it explicitly excluded
+    # i.e. no indirect path is possible either
+    def remove_explicit_leg(self, from_city, to_city):
+        self.remove_leg(from_city, to_city)
+        self.explicitly_excluded.add(self.matrix[from_city][to_city])
         
     
     # Returns a new Routing in which all the a->a edges are excluded from the graph 
@@ -212,13 +218,11 @@ class Routing:
                 if leg in included_routing.included | included_routing.implicitly_included:
                     replacement_leg_1 = included_routing.matrix[C][to_city]
                     if replacement_leg_1 in included_routing.undecided:
-                        included_routing.remove_leg(C, to_city)
-                        included_routing.explicitly_excluded.add(replacement_leg_1)
+                        included_routing.remove_explicit_leg(C, to_city)
                     
                     replacement_leg_2 = included_routing.matrix[to_city][C]
                     if replacement_leg_2 in included_routing.undecided:
-                        included_routing.remove_leg(to_city, C)
-                        included_routing.explicitly_excluded.add(replacement_leg_2)
+                        included_routing.remove_explicit_leg(to_city, C)
                         
                 # Optimization 2b: exclude paths that would make this one redundant
                 # If D->to_city is included (or implicitly included)
