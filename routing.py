@@ -67,9 +67,9 @@ class Routing:
                 self.matrix[from_city][to_city] = Leg(from_city, to_city, exists = False)
                 
         self.undecided = self.legs(existing_only = False)
-        self.included  = []
-        self.excluded  = []
-        self.implicitly_included = []
+        self.included  = set()
+        self.excluded  = set()
+        self.implicitly_included = set()
     
     # Creates a copy with independent Legs but not independent Cities.            
     def deepleg_copy(self):
@@ -86,11 +86,11 @@ class Routing:
                     new_routing.add_leg(from_city, to_city)
                     
                 if leg in self.included:
-                    new_routing.included.append(new_leg)
+                    new_routing.included.add(new_leg)
                 elif leg in self.excluded:
-                    new_routing.excluded.append(new_leg)
+                    new_routing.excluded.add(new_leg)
                     if leg in self.implicitly_included:
-                        new_routing.implicitly_included.append(new_leg)
+                        new_routing.implicitly_included.add(new_leg)
                 else:
                     new_routing.undecided.append(new_leg)
                     
@@ -127,9 +127,8 @@ class Routing:
         leg.exists = False
         if leg in self.undecided:
             self.undecided.remove(leg)
-        if leg in self.included:
-            self.included.remove(leg)
-        self.excluded.append(leg)
+        self.included.discard(leg)
+        self.excluded.add(leg)
         
     # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
     def add_leg(self, from_city, to_city):
@@ -138,9 +137,8 @@ class Routing:
         leg.exists = True
         if leg in self.undecided:
             self.undecided.remove(leg)
-        if leg in self.excluded:
-            self.excluded.remove(leg)
-        self.included.append(leg)
+        self.excluded.discard(leg)
+        self.included.add(leg)
         
     
     # Returns a new Routing in which all the a->a edges are excluded from the graph 
@@ -177,9 +175,9 @@ class Routing:
             # And we mark it implicitly included.
 #             for A in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
 #                 leg = included_routing.matrix[A][from_city]
-#                 if leg in included_routing.included + included_routing.implicitly_included:
+#                 if leg in included_routing.included | included_routing.implicitly_included:
 #                     included_routing.remove_leg(A, to_city)
-#                     included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
+#                     included_routing.implicitly_included.add(included_routing.matrix[A][to_city])
             
             # Optimization 1b: exclude redundant paths from from_city
             # If to_city->B is included (or implicitly included)
@@ -187,11 +185,11 @@ class Routing:
             # And we mark it implicitly included.
             for B in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
                 leg = included_routing.matrix[to_city][B]
-                if leg in included_routing.included + included_routing.implicitly_included:
+                if leg in included_routing.included | included_routing.implicitly_included:
                     redundant_leg = included_routing.matrix[from_city][B]
                     if redundant_leg in included_routing.undecided:
                         included_routing.remove_leg(from_city, B)
-                        included_routing.implicitly_included.append(redundant_leg)
+                        included_routing.implicitly_included.add(redundant_leg)
     
         return included_routing
         
@@ -217,7 +215,7 @@ class Routing:
         for ticket in tickets:
             # Take advantage of what we know
             ticket_leg = self.matrix[ticket.from_city][ticket.to_city]
-            if ticket_leg in self.included + self.implicitly_included:
+            if ticket_leg in self.included | self.implicitly_included:
                 # Hurrah, it's satisfied, we can check the next ticket.
                 continue
             
