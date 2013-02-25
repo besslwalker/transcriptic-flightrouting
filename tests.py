@@ -42,6 +42,7 @@ assert str(g.legs()) == "[<Leg:b->a>]"
 g.remove_leg(p2, p1)
 g.remove_leg(p1, p2)
 assert g.legs() == []
+assert g.included == []
 
 # Check __repr__ and __str__ methods for Routing
 assert repr(g) == "<Routing:a,b>"

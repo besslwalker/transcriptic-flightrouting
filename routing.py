@@ -127,6 +127,8 @@ class Routing:
         leg.exists = False
         if leg in self.undecided:
             self.undecided.remove(leg)
+        if leg in self.included:
+            self.included.remove(leg)
         self.excluded.append(leg)
         
     # Adds a leg to the graph -- undecided/included/excluded status is unaffected.
@@ -136,6 +138,8 @@ class Routing:
         leg.exists = True
         if leg in self.undecided:
             self.undecided.remove(leg)
+        if leg in self.excluded:
+            self.excluded.remove(leg)
         self.included.append(leg)
         
     
@@ -165,25 +169,27 @@ class Routing:
         
         included_routing.add_leg(from_city, to_city)
         
-        # Optimization 1a: exclude redundant paths to to_city
-        # If A->from_city is included (or implicitly included)
-        # we can stop considering A->to_city, since A->from_city->to_city is now a path.
-        # And we mark it implicitly included.
-#         for A in included_routing.sorted_cities():
-#             leg = included_routing.matrix[A][from_city]
-#             if leg in included_routing.included + included_routing.implicitly_included:
-#                 included_routing.remove_leg(A, to_city)
-#                 included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
+        if from_city != to_city:
         
-        # Optimization 1b: exclude redundant paths from from_city
-        # If to_city->B is included (or implicitly included)
-        # we can stop considering from_city->B, since from_city->to_city->B is now a path.
-        # And we mark it implicitly included.
-        for B in included_routing.sorted_cities():
-            leg = included_routing.matrix[to_city][B]
-            if leg in included_routing.included + included_routing.implicitly_included:
-                included_routing.remove_leg(from_city, B)
-                included_routing.implicitly_included.append(included_routing.matrix[from_city][B])
+            # Optimization 1a: exclude redundant paths to to_city
+            # If A->from_city is included (or implicitly included)
+            # we can stop considering A->to_city, since A->from_city->to_city is now a path.
+            # And we mark it implicitly included.
+    #         for A in included_routing.sorted_cities():
+    #             leg = included_routing.matrix[A][from_city]
+    #             if leg in included_routing.included + included_routing.implicitly_included:
+    #                 included_routing.remove_leg(A, to_city)
+    #                 included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
+            
+            # Optimization 1b: exclude redundant paths from from_city
+            # If to_city->B is included (or implicitly included)
+            # we can stop considering from_city->B, since from_city->to_city->B is now a path.
+            # And we mark it implicitly included.
+            for B in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
+                leg = included_routing.matrix[to_city][B]
+                if leg in included_routing.included + included_routing.implicitly_included:
+                    included_routing.remove_leg(from_city, B)
+                    included_routing.implicitly_included.append(included_routing.matrix[from_city][B])
     
         return included_routing
         
@@ -207,7 +213,14 @@ class Routing:
         cities = self.sorted_cities()
         
         for ticket in tickets:
-            # Determine reachability via BFS
+            # Take advantage of what we know
+            ticket_leg = self.matrix[ticket.from_city][ticket.to_city]
+            if ticket_leg in self.included + self.implicitly_included:
+                # Hurrah, it's satisfied, we can check the next ticket.
+                print "Found it!"
+                continue
+            
+            # Otherwise, determine reachability via BFS
             
             discovered = {}
             processed  = {}
