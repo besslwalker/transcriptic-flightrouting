@@ -199,6 +199,8 @@ c 0 1 0"""
 tri_cities = flightrouting.load_cities("triangle_cities.csv")
 tri_tickets = flightrouting.load_tickets("triangle_tickets.csv", flightrouting.make_city_dict(tri_cities))
 best = flightrouting.solve(routing.Routing(tri_cities).exclude_selfloops(), tri_tickets, 1.0, 0.2)
+print best.included
+print best.implicitly_included
 assert str(best) == \
 """  a b c d
 a 0 0 0 1

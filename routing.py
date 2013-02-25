@@ -175,11 +175,11 @@ class Routing:
             # If A->from_city is included (or implicitly included)
             # we can stop considering A->to_city, since A->from_city->to_city is now a path.
             # And we mark it implicitly included.
-    #         for A in included_routing.sorted_cities():
-    #             leg = included_routing.matrix[A][from_city]
-    #             if leg in included_routing.included + included_routing.implicitly_included:
-    #                 included_routing.remove_leg(A, to_city)
-    #                 included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
+#             for A in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
+#                 leg = included_routing.matrix[A][from_city]
+#                 if leg in included_routing.included + included_routing.implicitly_included:
+#                     included_routing.remove_leg(A, to_city)
+#                     included_routing.implicitly_included.append(included_routing.matrix[A][to_city])
             
             # Optimization 1b: exclude redundant paths from from_city
             # If to_city->B is included (or implicitly included)
@@ -188,8 +188,10 @@ class Routing:
             for B in [city for city in included_routing.sorted_cities() if city not in [from_city, to_city]]:
                 leg = included_routing.matrix[to_city][B]
                 if leg in included_routing.included + included_routing.implicitly_included:
-                    included_routing.remove_leg(from_city, B)
-                    included_routing.implicitly_included.append(included_routing.matrix[from_city][B])
+                    redundant_leg = included_routing.matrix[from_city][B]
+                    if redundant_leg in included_routing.undecided:
+                        included_routing.remove_leg(from_city, B)
+                        included_routing.implicitly_included.append(redundant_leg)
     
         return included_routing
         
@@ -217,7 +219,6 @@ class Routing:
             ticket_leg = self.matrix[ticket.from_city][ticket.to_city]
             if ticket_leg in self.included + self.implicitly_included:
                 # Hurrah, it's satisfied, we can check the next ticket.
-                print "Found it!"
                 continue
             
             # Otherwise, determine reachability via BFS
