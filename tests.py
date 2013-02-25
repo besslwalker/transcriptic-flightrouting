@@ -208,9 +208,12 @@ d 0 1 1 0"""
 
 # Test five cities
 best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
+print best
+print best.included
+print best.implicitly_included
 assert str(best) == \
 """  a b c d e
-a 0 0 1 0 0
+a 0 1 0 0 0
 b 0 0 1 0 0
 c 0 0 0 1 0
 d 0 0 0 0 1

@@ -113,6 +113,14 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     current_best = solve(excluded, tickets, mile_cost, takeoff_cost, current_best)
     
     # INCLUSION
+    
+    # Bounds when including the branch leg will be too costly
+    if current_best != None:
+        best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)
+        routing_cost = routing.cost(mile_cost, takeoff_cost, tickets)
+        if routing_cost + branch_leg.miles * mile_cost + takeoff_cost >= best_cost:
+            return current_best  # Adding this leg can't do any better
+    
     included = routing.include_leg(branch_leg.from_city, branch_leg.to_city)
     current_best = solve(included, tickets, mile_cost, takeoff_cost, current_best)
     
