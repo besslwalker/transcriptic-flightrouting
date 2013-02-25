@@ -208,6 +208,21 @@ class Routing:
                     replacement_leg_2 = included_routing.matrix[to_city][C]
                     if replacement_leg_2 in included_routing.undecided:
                         included_routing.remove_leg(to_city, C)
+                        
+                # Optimization 2b: exclude paths that would make this one redundant
+                # If D->to_city is included (or implicitly included)
+                # we can exclude from_city->D and D->from_city, since they would make from_city->to_city redundant.
+                # They are NOT implicitly included.
+                D = A
+                leg = included_routing.matrix[D][to_city]
+                if leg in included_routing.included | included_routing.implicitly_included:
+                    replacement_leg_1 = included_routing.matrix[from_city][D]
+                    if replacement_leg_1 in included_routing.undecided:
+                        included_routing.remove_leg(from_city, D)
+                    
+                    replacement_leg_2 = included_routing.matrix[D][from_city]
+                    if replacement_leg_2 in included_routing.undecided:
+                        included_routing.remove_leg(D, from_city)
     
         return included_routing
         
