@@ -14,6 +14,9 @@ class City:
         self.x  = x
         self.y  = y
         
+        self.required_origin = False
+        self.required_destination = False
+        
     def __repr__(self):
         return "".join(["<City:", str(self.id), "(", str(self.x), ",", str(self.y), ")>"])
         
@@ -52,6 +55,9 @@ class Ticket:
     def __init__(self, from_city, to_city):
         self.from_city = from_city
         self.to_city   = to_city
+        
+        self.from_city.required_origin = True
+        self.to_city.required_destination = True
         
     def __repr__(self):
         return "".join(["<Ticket:", str(self.from_city), "->", str(self.to_city), ">"])
@@ -163,6 +169,14 @@ class Routing:
     
         excluded_routing.remove_leg(from_city, to_city)
         
+        # Optimization: include necessary path to to_city
+        # If to_city is a necessary destination, and only one path
+        # A->to_city is not excluded, we must include A->to_city.
+        
+        # Optimization: include necessary path from from_city
+        # If from_city is a necessary origin, and only one path
+        # from_city->B remains, we must include from_city->B.
+        
         return excluded_routing
    
     # Returns a new Routing, in which the given leg is included in the graph
@@ -238,6 +252,14 @@ class Routing:
     # Returns a list of undecided legs
     def undecided_legs(self):
         return [leg for leg in self.legs(existing_only = False) if leg.undecided]
+        
+    # Returns a list of excluded legs
+    def excluded_legs(self):
+        return [leg for leg in self.legs(existing_only = False) if leg.excluded]
+        
+    # Returns a list of included legs
+    def included_legs(self):
+        return [leg for leg in self.legs(existing_only = False) if leg.included]
         
     # Returns True if the route from from_city to to_city is marked explicitly excluded
     # i.e. impossible.
