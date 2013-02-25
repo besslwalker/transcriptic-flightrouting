@@ -169,7 +169,7 @@ class Routing:
     
         excluded_routing.remove_leg(from_city, to_city)
         
-        # Optimization: include necessary path to to_city
+        # Optimization 4a: include necessary path to to_city
         # If to_city is a necessary destination, and only one path
         # A->to_city is not excluded, we must include A->to_city.
         if to_city.required_destination:
@@ -180,9 +180,15 @@ class Routing:
                 excluded_routing.add_leg(undecided_legs_to_city[0].from_city, to_city)
             
                     
-        # Optimization: include necessary path from from_city
+        # Optimization 4b: include necessary path from from_city
         # If from_city is a necessary origin, and only one path
         # from_city->B remains, we must include from_city->B.
+        if from_city.required_origin:
+            legs_from_city = [excluded_routing.matrix[from_city][B] for B in excluded_routing.sorted_cities()]
+            undecided_legs_from_city = [leg for leg in legs_from_city if leg.undecided]
+            excluded_legs_from_city    = [leg for leg in legs_from_city if leg.excluded]
+            if len(undecided_legs_from_city) == 1 and len(excluded_legs_from_city) == len(legs_from_city) - 1:
+                excluded_routing.add_leg(from_city, undecided_legs_from_city[0].to_city)
         
         return excluded_routing
    

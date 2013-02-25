@@ -213,15 +213,15 @@ c 0 0 0 0
 d 0 1 1 0"""
 
 # Test five cities
-# print "FIVE CITIES"
-# best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
-# assert str(best) == \
-# """  a b c d e
-# a 0 1 0 0 0
-# b 0 0 1 0 0
-# c 0 0 0 1 0
-# d 0 0 0 0 1
-# e 0 0 0 0 0"""
+print "FIVE CITIES"
+best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
+assert str(best) == \
+"""  a b c d e
+a 0 1 0 0 0
+b 0 0 1 0 0
+c 0 0 0 1 0
+d 0 0 0 0 1
+e 0 0 0 0 0"""
 
 # Test ticket de-duplicator
 dup_tickets = flightrouting.load_tickets("dup_tickets.csv", flightrouting.make_city_dict(tri_cities))
