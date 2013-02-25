@@ -231,14 +231,13 @@ b 0 0 0 0
 c 0 0 0 0
 d 0 0 0 0"""
 
-# Test six cities
-# best = flightrouting.main(["flightrouting.py", "six_cities.csv", "vee_tickets.csv"])
-# print best
-# assert str(best) == \
-# """  a b c d e f
-# a 0 0 1 0 0 0
-# b 0 0 0 0 0 0
-# c 0 0 0 1 0 0
-# d 0 1 1 0 0 1
-# e 0 0 1 0 0 0
-# f 0 0 0 0 0 0"""
+#Test six cities
+best = flightrouting.main(["flightrouting.py", "six_cities.csv", "vee_tickets.csv"])
+assert str(best) == \
+"""  a b c d e f
+a 0 0 1 0 0 0
+b 0 0 0 0 0 0
+c 0 0 0 1 0 0
+d 0 0 0 0 0 0
+e 0 0 1 0 0 0
+f 0 0 0 0 0 0"""
