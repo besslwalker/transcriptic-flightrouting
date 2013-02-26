@@ -183,10 +183,12 @@ def main(args):
     print "Legs to fly:"
     for leg in sorted(solution.legs(), key = lambda ll: str(ll.from_city) + str(ll.to_city)):
         print leg
+    print
         
     # Show ticket itineraries
+    print "Ticket itineraries:"
     for ticket in sorted(all_tickets, key = lambda tt: str(tt.from_city) + str(tt.to_city)):
-        print str(ticket) + ": ", ticket.itinerary(solution)
+        print str(ticket) + ": ", ", ".join([str(ll) for ll in ticket.itinerary(solution)])
     
     return solution
     

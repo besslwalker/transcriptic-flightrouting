@@ -64,7 +64,7 @@ class Ticket:
         return "".join(["<Ticket:", str(self.from_city), "->", str(self.to_city), ">"])
         
     def __str__(self):
-        return self.__repr__()
+        return " -> ".join([str(self.from_city), str(self.to_city)])
     
     # Returns a list of legs which connect from_city to to_city.
     def itinerary(self, routing):
