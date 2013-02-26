@@ -421,59 +421,61 @@ class Routing:
                 
         cities = greedy_routing.sorted_cities()
         
-        ticket_queue = [(ticket.from_city.distance_to(ticket.to_city), ticket) for ticket in tickets]
-        heapq.heapify(ticket_queue)
+        ticket_queue = tickets[:]
+        for ticket in ticket_queue:
+            if ticket.from_city == ticket.to_city:
+                ticket.cost = 0
+            else:
+                ticket.cost = takeoff_cost + \
+                              miles_cost * greedy_routing.matrix[ticket.from_city][ticket.to_city].miles
         
         while len(ticket_queue) != 0:
-            ticket = heapq.heappop(ticket_queue)[1]
-            
-            from_legs = [leg for leg in greedy_routing.matrix[ticket.from_city].values() if leg.exists]
-            to_legs   = [self.matrix[city][ticket.to_city] for city in cities if self.matrix[city][ticket.to_city].exists]
+            ticket = min(ticket_queue, key = lambda tt: tt.cost)
+            ticket_queue.remove(ticket)
+#            print ticket
             
             # Add this shortest ticket directly.
             if ticket.from_city == ticket.to_city:
                 greedy_routing.add_implicit_leg(ticket.from_city, ticket.to_city)
             else:
                 greedy_routing.add_leg(ticket.from_city, ticket.to_city)
-                
                 # Now update the other tickets based on this newly available leg.
                 
                 # For all tickets from cities A which reach from_city,
-                # compare the cost of A->B to the cost of from_city->B
-                # (since the cost of A->from_city is already covered).
+                # compare the cost of A->B to the cost of to_city->B
+                # (since the cost of A->from_city->to_city is already covered).
                 # Update the ticket if necessary.
                 reaching_from_city = greedy_routing.connecting_cities(ticket.from_city)
                 for earlier_city in reaching_from_city:
-                    candidate_tickets = [tt[1] for tt in ticket_queue if tt[1].from_city == earlier_city]
+                    candidate_tickets = [tt for tt in ticket_queue if tt.from_city == earlier_city]
                     for candidate in candidate_tickets:
                         direct_cost = takeoff_cost + \
                                       miles_cost * greedy_routing.matrix[candidate.from_city][candidate.to_city].miles
                         additional_cost = takeoff_cost + \
-                                      miles_cost * greedy_routing.matrix[ticket.from_city][candidate.to_city].miles
-                                      
+                                      miles_cost * greedy_routing.matrix[ticket.to_city][candidate.to_city].miles
                         if additional_cost < direct_cost:  # Poor customer, no direct flight for you!
-                            ticket_queue.remove((direct_cost, candidate))
-                            ticket_queue.append((additional_cost, Ticket(ticket.from_city, candidate.to_city)))
+                            new_ticket = Ticket(ticket.to_city, candidate.to_city)
+                            new_ticket.cost = additional_cost 
+                            ticket_queue.remove(candidate)
+                            ticket_queue.append(new_ticket)
                             
                 
                 # For all tickets to cities B which are reachable from to_city,
-                # compare the cost A->B to the cost of A->to_city
-                # (since the cost of B->to_city is already covered).
+                # compare the cost A->B to the cost of A->from_city
+                # (since the cost of from_city->to_city->B is already covered).
                 # Update the ticket if necessary.
                 to_city_reaches = greedy_routing.connected_cities(ticket.to_city)
                 for later_city in to_city_reaches:
-                    candidate_tickets = [tt[1] for tt in ticket_queue if tt[1].to_city == later_city]
+                    candidate_tickets = [tt for tt in ticket_queue if tt.to_city == later_city]
                     for candidate in candidate_tickets:
                         direct_cost = takeoff_cost + \
-                                      miles_cost * greedy_routing.matrix[candidate.from_city][candidate.to_city]
+                                      miles_cost * greedy_routing.matrix[candidate.from_city][candidate.to_city].miles
                         additional_cost = takeoff_cost + \
-                                      miles_cost * greedy_routing.matrix[candidate.from_city][ticket.to_city].miles
-                                      
-                    if additional_cost < direct_cost:  # No direct flight for you!
-                        ticket_queue.remove((direct_cost, candidate))
-                        ticket_queue.append((additional_cost, Ticket(candidate.from_city, ticket.to_city)))
-                
-                # I've played merry heck with the heap, let's fix it up.
-                heapq.heapify(ticket_queue)                          
-                            
+                                      miles_cost * greedy_routing.matrix[candidate.from_city][ticket.from_city].miles
+                        if additional_cost < direct_cost:  # No direct flight for you!
+                            new_ticket = Ticket(candidate.from_city, ticket.from_city)
+                            new_ticket.cost = additional_cost
+                            ticket_queue.remove(candidate)
+                            ticket_queue.append(new_ticket)                                
+                                
         return greedy_routing

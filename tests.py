@@ -281,15 +281,43 @@ c 0 0 0 0
 d 0 0 0 0"""
 
 # Test greedy algorithm (optimal when all cities appear on tickets)
+print "GREEDY NO TICKETS"
 one_city = flightrouting.load_cities("1_city.csv")
-assert str(routing.Routing(one_city).greedy([])) == \
+assert str(routing.Routing(one_city).greedy(1.0, 0.2, [])) == \
 """  c
 c 0"""
+print "GREEDY SELF-LOOP TICKET"
 d = flightrouting.make_city_dict(one_city)
-assert str(routing.Routing(one_city).greedy([routing.Ticket(d["c"], d["c"])])) == \
+assert str(routing.Routing(one_city).greedy(1.0, 0.2, [routing.Ticket(d["c"], d["c"])])) == \
 """  c
 c 0"""
 
+# Greedy algorithm gives optimal solution that ignores city d.
+print "GREEDY TRIANGLE TICKETS"
+tri_cities = flightrouting.load_cities("triangle_cities.csv")
+d = flightrouting.make_city_dict(tri_cities)
+tri_tickets = flightrouting.load_tickets("triangle_tickets.csv", d)
+greedy = routing.Routing(tri_cities).greedy(1.0, 0.2, tri_tickets)
+assert str(greedy) == \
+"""  a b c d
+a 0 1 0 0
+b 0 0 1 0
+c 0 0 0 0
+d 0 0 0 0"""
+
+print "GREEDY LINEAR TICKETS"
+linear_cities = flightrouting.load_cities("linear_cities.csv")
+linear_dict = flightrouting.make_city_dict(linear_cities)
+linear_tickets = flightrouting.load_tickets("linear_tickets.csv", linear_dict)
+greedy = routing.Routing(linear_cities).greedy(1.0, 0.2, linear_tickets)
+print greedy
+assert str(greedy) == \
+"""  a b c d e
+a 0 0 1 0 0
+b 0 0 0 1 0
+c 0 0 0 1 0
+d 0 0 0 0 1
+e 0 0 0 0 0"""
 
 # Test six cities
 # print "SIX CITES VEE"
