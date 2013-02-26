@@ -369,6 +369,20 @@ class Routing:
             processed[current_city] = True
             
         return [city for city in cities if discovered[city] == True]
+        
+    # Returns a list of cities which connect to the given City
+    def connecting_cities(self, to_city):
+        # We need a backwards BFS.  \
+        # No problem, we'll look at connectED cities in a Routing with reversed edges.
+        reversed_routing = Routing(self.sorted_cities())
+        cities = reversed_routing.sorted_cities()
+        
+        for old_from_city in cities:
+            for old_to_city in cities:
+                if self.matrix[old_from_city][old_to_city].exists:
+                    reversed_routing.add_leg(old_to_city, old_from_city)
+                                        
+        return reversed_routing.connected_cities(to_city)
                 
     # Given a list of tickets, returns a list of those tickets that can't be satisfied.
     def unconnected_tickets(self, tickets):
@@ -400,7 +414,7 @@ class Routing:
         return simple_routing
         
     # Returns a new Routing holding a greedy solution to the problem.
-    def greedy(self, tickets):
+    def greedy(self, miles_cost, takeoff_cost, tickets):
         greedy_routing = Routing(self.sorted_cities())
         if len(tickets) == 0:
             return greedy_routing
@@ -416,12 +430,50 @@ class Routing:
             from_legs = [leg for leg in greedy_routing.matrix[ticket.from_city].values() if leg.exists]
             to_legs   = [self.matrix[city][ticket.to_city] for city in cities if self.matrix[city][ticket.to_city].exists]
             
-            if len(from_legs) == 0 and len(to_legs) == 0:
-                # The origin has no out edges; the destination has no in edges.
-                # So we simply add the direct leg.
-                if ticket.from_city == ticket.to_city:
-                    greedy_routing.add_implicit_leg(ticket.from_city, ticket.to_city)
-                else:
-                    greedy_routing.add_leg(ticket.from_city, ticket.to_city)
+            # Add this shortest ticket directly.
+            if ticket.from_city == ticket.to_city:
+                greedy_routing.add_implicit_leg(ticket.from_city, ticket.to_city)
+            else:
+                greedy_routing.add_leg(ticket.from_city, ticket.to_city)
+                
+                # Now update the other tickets based on this newly available leg.
+                
+                # For all tickets from cities A which reach from_city,
+                # compare the cost of A->B to the cost of from_city->B
+                # (since the cost of A->from_city is already covered).
+                # Update the ticket if necessary.
+                reaching_from_city = greedy_routing.connecting_cities(ticket.from_city)
+                for earlier_city in reaching_from_city:
+                    candidate_tickets = [tt[1] for tt in ticket_queue if tt[1].from_city == earlier_city]
+                    for candidate in candidate_tickets:
+                        direct_cost = takeoff_cost + \
+                                      miles_cost * greedy_routing.matrix[candidate.from_city][candidate.to_city].miles
+                        additional_cost = takeoff_cost + \
+                                      miles_cost * greedy_routing.matrix[ticket.from_city][candidate.to_city].miles
+                                      
+                        if additional_cost < direct_cost:  # Poor customer, no direct flight for you!
+                            ticket_queue.remove((direct_cost, candidate))
+                            ticket_queue.append((additional_cost, Ticket(ticket.from_city, candidate.to_city)))
+                            
+                
+                # For all tickets to cities B which are reachable from to_city,
+                # compare the cost A->B to the cost of A->to_city
+                # (since the cost of B->to_city is already covered).
+                # Update the ticket if necessary.
+                to_city_reaches = greedy_routing.connected_cities(ticket.to_city)
+                for later_city in to_city_reaches:
+                    candidate_tickets = [tt[1] for tt in ticket_queue if tt[1].to_city == later_city]
+                    for candidate in candidate_tickets:
+                        direct_cost = takeoff_cost + \
+                                      miles_cost * greedy_routing.matrix[candidate.from_city][candidate.to_city]
+                        additional_cost = takeoff_cost + \
+                                      miles_cost * greedy_routing.matrix[candidate.from_city][ticket.to_city].miles
+                                      
+                    if additional_cost < direct_cost:  # No direct flight for you!
+                        ticket_queue.remove((direct_cost, candidate))
+                        ticket_queue.append((additional_cost, Ticket(candidate.from_city, ticket.to_city)))
+                
+                # I've played merry heck with the heap, let's fix it up.
+                heapq.heapify(ticket_queue)                          
                             
         return greedy_routing
