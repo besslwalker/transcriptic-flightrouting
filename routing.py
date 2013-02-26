@@ -402,16 +402,26 @@ class Routing:
     # Returns True if routes satisfying all tickets exist.  
     def is_valid(self, tickets):
         return len(self.unconnected_tickets(tickets)) == 0
+        
+    # Returns the total number of miles flown to satisfy the given Tickets
+    # Currently assumes each leg of the routing is flown exactly once.
+    def miles(self, tickets):
+        miles = sum([leg.miles for leg in self.legs()])
+        
+        return miles
+        
+    # Returns the total number of takeoffs flown to satisfy the given Tickets.
+    # Currently assumes each leg of the routing is flown exactly once.
+    def takeoffs(self, tickets):
+        takeoffs = len(self.legs())
+        
+        return takeoffs
             
     # Given costs per mile and per takeoff, and a list of Tickets, 
     # returns the cost of flying those flights with this routing.
-    # 
-    # Currently ignores the tickets entirely and just calculates the cost of flying
-    # each leg of the routing once.        
     def cost(self, mile_cost, takeoff_cost, tickets):
-        legs = self.legs()
-        miles = sum([leg.miles for leg in legs])
-        takeoffs = len(legs)
+        miles = self.miles(tickets)
+        takeoffs = self.takeoffs(tickets)
                 
         return miles * mile_cost + takeoffs * takeoff_cost
         

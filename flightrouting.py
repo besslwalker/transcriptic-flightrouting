@@ -189,6 +189,11 @@ def main(args):
     print "Ticket itineraries:"
     for ticket in sorted(all_tickets, key = lambda tt: str(tt.from_city) + str(tt.to_city)):
         print str(ticket) + ": ", ", ".join([str(ll) for ll in ticket.itinerary(solution)])
+    print
+        
+    # Show total miles and total takeoffs:
+    print "Total miles:", solution.miles(tickets)
+    print "Total takeoffs:", solution.takeoffs(tickets)
     
     return solution
     
