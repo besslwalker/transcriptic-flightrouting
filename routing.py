@@ -307,21 +307,21 @@ class Routing:
             discovered[from_city] = True
             queue = deque([from_city])
             while len(queue) != 0:
-                city = queue.popleft()
+                current_city = queue.popleft()
                 # If we've reached the destination, obviously it's reachable!
-                if city == to_city:
+                if current_city == to_city:
                     return True
                 
                 # Process
-                connections = [to_city for to_city in self.matrix[city] if self.matrix[city][to_city].exists]
-                for to_city in connections:
-                    if not discovered[to_city]:
-                        discovered[to_city] = True
-                        queue.append(to_city)
+                connections = [next_city for next_city in self.matrix[current_city] if self.matrix[current_city][next_city].exists]
+                for next_city in connections:
+                    if not discovered[next_city]:
+                        discovered[next_city] = True
+                        queue.append(next_city)
                 
-                processed[city] = True
+                processed[current_city] = True
             else: # Whoops, we ran out of cities to check but never found the destination!
-                # This ticket can't be satisfied, so...
+                # This destination isn't reachable from this origin, so...
                 return False
         
     # Returns True if routes satisfying all tickets exist.  

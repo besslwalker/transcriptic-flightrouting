@@ -111,6 +111,8 @@ b 0 0 0 0
 c 0 0 0 0
 d 0 0 0 0"""
 assert tri_route.is_valid(tickets) == True
+assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
+assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
 assert tri_route.cost(1.0, 0.2, tickets) == 2 * math.sqrt(5) * 1.0 + 2 * 0.2
 
 tri_route.remove_leg(city_dict["a"], city_dict["b"])
@@ -127,6 +129,9 @@ b 0 0 0 0
 c 0 0 0 0
 d 0 1 1 0"""
 assert tri_route.is_valid(tickets) == True
+assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
+assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
+assert tri_route.are_connected(city_dict["d"], city_dict["a"]) == False
 assert str(tri_route.cost(1.0, 0.2, tickets)) == str((1 + 2 * math.sqrt(2)) * 1.0 + 3 * 0.2)
 
 # Test Routing's copy method and leg independence
@@ -144,6 +149,9 @@ a 0 1 0 1
 b 0 0 0 0
 c 0 0 0 0
 d 0 1 1 0"""
+assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
+assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
+
 
 excluded = included.exclude_leg(city_dict["d"], city_dict["b"])
 #assert str(tri_route.excluded) != str(excluded.excluded)  # Routing no longer has .excluded
