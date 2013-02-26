@@ -310,7 +310,6 @@ linear_cities = flightrouting.load_cities("linear_cities.csv")
 linear_dict = flightrouting.make_city_dict(linear_cities)
 linear_tickets = flightrouting.load_tickets("linear_tickets.csv", linear_dict)
 greedy = routing.Routing(linear_cities).greedy(1.0, 0.2, linear_tickets)
-print greedy
 assert str(greedy) == \
 """  a b c d e
 a 0 0 1 0 0
@@ -320,27 +319,27 @@ d 0 0 0 0 1
 e 0 0 0 0 0"""
 
 # Test six cities
-# print "SIX CITES VEE"
-# best = flightrouting.main(["flightrouting.py", "6_cities.csv", "vee_tickets.csv"])
-# assert str(best) == \
-# """  a b c d e f
-# a 0 0 1 0 0 0
-# b 0 0 0 0 0 0
-# c 0 0 0 1 0 0
-# d 0 0 0 0 0 0
-# e 0 0 1 0 0 0
-# f 0 0 0 0 0 0"""
+print "SIX CITES VEE"
+best = flightrouting.main(["flightrouting.py", "6_cities.csv", "vee_tickets.csv"])
+assert str(best) == \
+"""  a b c d e f
+a 0 0 1 0 0 0
+b 0 0 0 0 0 0
+c 0 0 0 1 0 0
+d 0 0 0 0 0 0
+e 0 0 1 0 0 0
+f 0 0 0 0 0 0"""
 
-# print "SIX CITIES FOUR CORNERS"
-# best = flightrouting.main(["flightrouting.py", "6_cities.csv", "corner_tickets.csv"])
-# assert str(best) == \
-# """  a b c d e f
-# a 0 1 0 0 1 0
-# b 0 0 0 0 0 1
-# c 0 0 0 0 0 0
-# d 0 0 0 0 0 0
-# e 0 0 0 0 0 0
-# f 0 0 0 0 0 0"""
+print "SIX CITIES FOUR CORNERS"
+best = flightrouting.main(["flightrouting.py", "6_cities.csv", "corner_tickets.csv"])
+assert str(best) == \
+"""  a b c d e f
+a 0 0 0 0 1 0
+b 0 0 0 0 0 0
+c 0 0 0 0 0 0
+d 0 0 0 0 0 0
+e 0 0 0 0 0 1
+f 0 1 0 0 0 0"""
 
 # print "SEVEN CITIES, TEST TICKETS"
 # best = flightrouting.main(["flightrouting.py", "7_cities.csv", "tickets.csv"])

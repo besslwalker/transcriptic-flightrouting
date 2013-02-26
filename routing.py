@@ -49,7 +49,7 @@ class Leg:
         return "".join(["<Leg:", str(self.from_city), "->", str(self.to_city), ">"])
         
     def __str__(self):
-        return self.__repr__()
+        return " -> ".join([str(self.from_city), str(self.to_city)])
         
 # A Ticket consists of an origin City, a destination City, and a list of Legs to fly.
 class Ticket:

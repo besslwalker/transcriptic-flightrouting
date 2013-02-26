@@ -179,6 +179,11 @@ def main(args):
     current_best = unrouted.greedy(1.0, 0.2, tickets)
     solution = solve(unrouted, tickets, 1.0, 0.2, current_best)
     
+    # Show the legs to fly
+    print "Legs to fly:"
+    for leg in sorted(solution.legs(), key = lambda ll: str(ll.from_city) + str(ll.to_city)):
+        print leg
+    
     return solution
     
 if __name__ == "__main__":
