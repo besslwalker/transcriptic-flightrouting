@@ -84,8 +84,19 @@ def dedup_tickets(tickets):
             ticket_reprs.append(repr(ticket))
             
     return deduped_tickets
+    
+# Returns a list of Cities mentioned in the tickets, sorted by city_id.
+def ticket_sorted_cities(tickets):
+    ticket_cities = []
+    for ticket in tickets:
+        if ticket.from_city not in ticket_cities:
+            ticket_cities.append(from_city)
+        if ticket.to_city not in ticket_cities:
+            ticket_cities.append(to_city)
+            
+    return sorted(ticket_cities, key = lambda city: city.id)
 
-# Recursively solves the flight routing problem.    
+# Recursively solves the flight routing problem, returning the current best solution.   
 def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     # Have we even got any tickets left to connect?  If not, we're done.
     if len(tickets) == 0:
@@ -97,13 +108,18 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     if len(tickets) == 1 and tickets[0].from_city != tickets[0].to_city:
         return routing.include_leg(tickets[0].from_city, tickets[0].to_city)
         
+    # And if all the cities are in the tickets, it's no longer NP-complete;
+    # a greedy algorithm will do.
+#     if routing.sorted_cities() == ticket_sorted_cities(tickets):
+#         return routing.greedy(tickets)
+        
     # We must include any legs that form the only remaining path to fulfill a ticket.
-    unconnected = routing.unconnected_tickets(tickets)
-    for ticket in unconnected:
-        route = routing.single_possible_route(ticket.from_city, ticket.to_city)
-        if route != None:  # There's exactly one possible route on non-excluded edges.
-            for route_leg in route:
-                routing = routing.include_leg(route_leg.from_city, route_leg.to_city)
+#     unconnected = routing.unconnected_tickets(tickets)
+#     for ticket in unconnected:
+#         route = routing.single_possible_route(ticket.from_city, ticket.to_city)
+#         if route != None:  # There's exactly one possible route on non-excluded edges.
+#             for route_leg in route:
+#                 routing = routing.include_leg(route_leg.from_city, route_leg.to_city)
         
     # Backtracks when we've ruled out a ticket's route
     for ticket in tickets:
@@ -124,8 +140,8 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
             cost = routing.cost(mile_cost, takeoff_cost, tickets)
             if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
                 current_best = routing
-        else:
-            print routing
+#         else:
+#             print routing
         return current_best
             
     branch_leg = undecided_legs[-1]

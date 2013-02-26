@@ -222,7 +222,6 @@ c 0 0 0"""
 two_tickets = [routing.Ticket(d["a"], d["c"]), routing.Ticket(d["a"], d["b"])]
 print "THREE CITIES, TWO TICKETS"
 best = flightrouting.solve(three_routing.exclude_selfloops(), two_tickets, 1.0, 0.2, three_routing.simple(two_tickets))
-print best
 assert str(best) == \
 """  a b c
 a 0 0 1
@@ -268,9 +267,20 @@ b 0 0 0 0
 c 0 0 0 0
 d 0 0 0 0"""
 
+# Test greedy algorithm (optimal when all cities appear on tickets)
+one_city = flightrouting.load_cities("1_city.csv")
+assert str(routing.Routing(one_city).greedy(1.0, 0.2, [])) == \
+"""  c
+c 0"""
+d = flightrouting.make_city_dict(one_city)
+assert str(routing.Routing(one_city).greedy(1.0, 0.2, [routing.Ticket(d["c"], d["c"])])) == \
+"""  c
+c 0"""
+
+
 # Test six cities
 # print "SIX CITES VEE"
-# best = flightrouting.main(["flightrouting.py", "six_cities.csv", "vee_tickets.csv"])
+# best = flightrouting.main(["flightrouting.py", "6_cities.csv", "vee_tickets.csv"])
 # assert str(best) == \
 # """  a b c d e f
 # a 0 0 1 0 0 0
@@ -279,9 +289,9 @@ d 0 0 0 0"""
 # d 0 0 0 0 0 0
 # e 0 0 1 0 0 0
 # f 0 0 0 0 0 0"""
-# 
+
 # print "SIX CITIES FOUR CORNERS"
-# best = flightrouting.main(["flightrouting.py", "six_cities.csv", "corner_tickets.csv"])
+# best = flightrouting.main(["flightrouting.py", "6_cities.csv", "corner_tickets.csv"])
 # assert str(best) == \
 # """  a b c d e f
 # a 0 1 0 0 1 0
@@ -290,7 +300,7 @@ d 0 0 0 0"""
 # d 0 0 0 0 0 0
 # e 0 0 0 0 0 0
 # f 0 0 0 0 0 0"""
-# 
+
 # print "SEVEN CITIES, TEST TICKETS"
 # best = flightrouting.main(["flightrouting.py", "7_cities.csv", "tickets.csv"])
 # print best
