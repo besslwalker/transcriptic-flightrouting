@@ -327,47 +327,10 @@ class Routing:
     # Returns True if routes satisfying all tickets exist.  
     # Uses what information it can, then falls back on a naive BFS.
     def is_valid(self, tickets):
-        cities = self.sorted_cities()
-        
         for ticket in tickets:
-            # Take advantage of what we know
-            ticket_leg = self.matrix[ticket.from_city][ticket.to_city]
-            if ticket_leg.included or ticket_leg.implicitly_included:
-                # Hurrah, it's satisfied, we can check the next ticket.
-                continue
-                
-            if ticket_leg.explicitly_excluded:
-                # Well, we can't get there from here -- this isn't valid!
+            if not self.are_connected(ticket.from_city, ticket.to_city):
                 return False
-            
-            # Otherwise, determine reachability via BFS
-            
-            discovered = {}
-            processed  = {}
-            for city in cities:
-                discovered[city] = False
-                processed[city] = False
-                
-            discovered[ticket.from_city] = True
-            queue = deque([ticket.from_city])
-            while len(queue) != 0:
-                from_city = queue.popleft()
-                # If we're at the destination, we're done with this ticket.
-                if from_city == ticket.to_city:
-                    break
-                
-                # Process
-                connections = [to_city for to_city in self.matrix[from_city] if self.matrix[from_city][to_city].exists]
-                for to_city in connections:
-                    if not discovered[to_city]:
-                        discovered[to_city] = True
-                        queue.append(to_city)
-                
-                processed[from_city] = True
-            else: # Whoops, we ran out of cities to check but never found the destination!
-                # This ticket can't be satisfied, so...
-                return False
-                
+                            
         return True
     
     # Given costs per mile and per takeoff, and a list of Tickets, 
