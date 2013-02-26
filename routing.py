@@ -158,7 +158,7 @@ class Routing:
         new_routing = self.deepleg_copy()
         
         for city in new_routing.sorted_cities():
-            new_routing.remove_leg(city, city)
+            new_routing.add_implicit_leg(city, city)
             
         return new_routing
         
