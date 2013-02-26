@@ -370,15 +370,39 @@ class Routing:
                 # This destination isn't reachable from this origin, so...
                 return False
                 
+    # Returns a list of Cities to which the given City can connect.
+    def connected_cities(self, from_city):
+        cities = self.sorted_cities()
+        
+        discovered = {}
+        processed = {}
+        for city in cities:
+            discovered[city] = False
+            processed[city] = False
+            
+        discovered[from_city] = True
+        queue = deque([from_city])
+        while len(queue) != 0:
+            current_city = queue.popleft()
+            
+            connections = [next_city for next_city in self.matrix[current_city] if self.matrix[current_city][next_city].exists]
+            for next_city in connections:
+                if not discovered[next_city]:
+                    discovered[next_city] = True
+                    queue.append(next_city)
+                    
+            processed[current_city] = True
+            
+        return [city for city in cities if discovered[city] == True]
+                
     # Given a list of tickets, returns a list of those tickets that can't be satisfied.
     def unconnected_tickets(self, tickets):
         return [ticket for ticket in tickets if not self.are_connected(ticket.from_city, ticket.to_city)]
         
     # Returns True if routes satisfying all tickets exist.  
-    # Uses what information it can, then falls back on a naive BFS.
     def is_valid(self, tickets):
         return len(self.unconnected_tickets(tickets)) == 0
-    
+            
     # Given costs per mile and per takeoff, and a list of Tickets, 
     # returns the cost of flying those flights with this routing.
     # 

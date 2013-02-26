@@ -113,6 +113,7 @@ d 0 0 0 0"""
 assert tri_route.is_valid(tickets) == True
 assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
 assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
+assert tri_route.connected_cities(city_dict["a"]) == [city_dict["a"], city_dict["b"], city_dict["c"]]
 assert tri_route.cost(1.0, 0.2, tickets) == 2 * math.sqrt(5) * 1.0 + 2 * 0.2
 
 tri_route.remove_leg(city_dict["a"], city_dict["b"])
@@ -132,7 +133,14 @@ assert tri_route.is_valid(tickets) == True
 assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
 assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
 assert tri_route.are_connected(city_dict["d"], city_dict["a"]) == False
-assert str(tri_route.unconnected_tickets(tickets + [routing.Ticket(city_dict["d"], city_dict["a"])])) =="[<Ticket:d->a>]"
+
+assert tri_route.connected_cities(city_dict["a"]) == [city_dict["a"], city_dict["b"], city_dict["c"], city_dict["d"]]
+assert tri_route.connected_cities(city_dict["b"]) == [city_dict["b"]]
+assert tri_route.connected_cities(city_dict["c"]) == [city_dict["c"]]
+assert tri_route.connected_cities(city_dict["d"]) == [city_dict["b"], city_dict["c"], city_dict["d"]]
+
+assert str(tri_route.unconnected_tickets(tickets + [routing.Ticket(city_dict["d"], city_dict["a"])])) == "[<Ticket:d->a>]"
+
 assert str(tri_route.cost(1.0, 0.2, tickets)) == str((1 + 2 * math.sqrt(2)) * 1.0 + 3 * 0.2)
 
 # Test Routing's copy method and leg independence
