@@ -343,32 +343,7 @@ class Routing:
             # Yay, we know there's no such path!
             return False
         else:
-            # Oh bother, we have to do actual work.
-            discovered = {}
-            processed  = {}
-            for city in cities:
-                discovered[city] = False
-                processed[city] = False
-                
-            discovered[from_city] = True
-            queue = deque([from_city])
-            while len(queue) != 0:
-                current_city = queue.popleft()
-                # If we've reached the destination, obviously it's reachable!
-                if current_city == to_city:
-                    return True
-                
-                # Process
-                connections = [next_city for next_city in self.matrix[current_city] if self.matrix[current_city][next_city].exists]
-                for next_city in connections:
-                    if not discovered[next_city]:
-                        discovered[next_city] = True
-                        queue.append(next_city)
-                
-                processed[current_city] = True
-            else: # Whoops, we ran out of cities to check but never found the destination!
-                # This destination isn't reachable from this origin, so...
-                return False
+            return to_city in self.connected_cities(from_city)
                 
     # Returns a list of Cities to which the given City can connect.
     def connected_cities(self, from_city):
