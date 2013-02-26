@@ -331,11 +331,7 @@ class Routing:
     # Returns True if routes satisfying all tickets exist.  
     # Uses what information it can, then falls back on a naive BFS.
     def is_valid(self, tickets):
-        for ticket in tickets:
-            if not self.are_connected(ticket.from_city, ticket.to_city):
-                return False
-                            
-        return True
+        return len(self.unconnected_tickets(tickets)) == 0
     
     # Given costs per mile and per takeoff, and a list of Tickets, 
     # returns the cost of flying those flights with this routing.
