@@ -401,41 +401,28 @@ class Routing:
         return simple_routing
         
     # Returns a new Routing holding a greedy solution to the problem.
-    def greedy(self, mile_cost, takeoff_cost, tickets):
-        greedy_routing = Routing(self.sorted_cities()).exclude_selfloops()
+    def greedy(self, tickets):
+        greedy_routing = Routing(self.sorted_cities())
         if len(tickets) == 0:
             return greedy_routing
                 
         cities = greedy_routing.sorted_cities()
         
-        # Initialize costs and path-parents
-        for from_city in cities:
-            for to_city in cities:
-                leg = greedy_routing.matrix[from_city][to_city]
-                if from_city == to_city:
-                    leg.cost = 0
+        ticket_queue = [(ticket.from_city.distance_to(ticket.to_city), ticket) for ticket in tickets]
+        heapq.heapify(ticket_queue)
+        
+        while len(ticket_queue) != 0:
+            ticket = heapq.heappop(ticket_queue)[1]
+            
+            from_legs = [leg for leg in greedy_routing.matrix[ticket.from_city].values() if leg.exists]
+            to_legs   = [self.matrix[city][ticket.to_city] for city in cities if self.matrix[city][ticket.to_city].exists]
+            
+            if len(from_legs) == 0 and len(to_legs) == 0:
+                # The origin has no out edges; the destination has no in edges.
+                # So we simply add the direct leg.
+                if ticket.from_city == ticket.to_city:
+                    greedy_routing.add_implicit_leg(ticket.from_city, ticket.to_city)
                 else:
-                    leg.cost = leg.miles * mile_cost + takeoff_cost
-                leg.penultimate_city = leg.from_city
-                
-        # All-pairs shortest paths, weighted by cost rather than distance
-        for between_city in cities:
-            for from_city in cities:
-                for to_city in cities:
-                    indirect_cost = greedy_routing.matrix[from_city][between_city].cost + \
-                                    greedy_routing.matrix[between_city][to_city].cost
-                    if indirect_cost < greedy_routing.matrix[from_city][to_city].cost:
-                        greedy_routing.matrix[from_city][to_city].cost = indirect_cost
-                        greedy_routing.matrix[from_city][to_city].penultimate_city = between_city
-                        
-        # Add the legs necessary to fulfill the tickets on the paths found.
-        for ticket in tickets:
-            # Backtrack from from_city to to_city
-            city   = ticket.to_city
-            while city != ticket.from_city:
-                leg = greedy_routing.matrix[ticket.from_city][city]
-                greedy_routing.add_leg(leg.penultimate_city, city)
-                
-                city = leg.penultimate_city
-                
+                    greedy_routing.add_leg(ticket.from_city, ticket.to_city)
+                            
         return greedy_routing

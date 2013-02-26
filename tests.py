@@ -269,11 +269,11 @@ d 0 0 0 0"""
 
 # Test greedy algorithm (optimal when all cities appear on tickets)
 one_city = flightrouting.load_cities("1_city.csv")
-assert str(routing.Routing(one_city).greedy(1.0, 0.2, [])) == \
+assert str(routing.Routing(one_city).greedy([])) == \
 """  c
 c 0"""
 d = flightrouting.make_city_dict(one_city)
-assert str(routing.Routing(one_city).greedy(1.0, 0.2, [routing.Ticket(d["c"], d["c"])])) == \
+assert str(routing.Routing(one_city).greedy([routing.Ticket(d["c"], d["c"])])) == \
 """  c
 c 0"""
 
