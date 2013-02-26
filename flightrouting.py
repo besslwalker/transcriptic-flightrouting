@@ -100,8 +100,8 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     # We must include any legs that form the only remaining path to fulfill a ticket.
 #     unconnected = routing.unconnected_tickets(tickets)
 #     for ticket in unconnected:
-#         if routing.num_possible_routes(ticket.from_city, ticket.to_city) == 1:
-#             route = routing.route(ticket.from_city, ticket.to_city)
+#         if routing.has_single_possible_route(ticket.from_city, ticket.to_city):
+#             route = ticket.itinerary(routing)
 #             for route_leg in route:
 #                 routing = routing.include_leg(route_leg.from_city, route_leg.to_city)
         

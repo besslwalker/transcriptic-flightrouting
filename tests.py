@@ -167,22 +167,22 @@ assert excluded.cost(1.0, 0.2, tickets) == 1.0 * (math.sqrt(5) + 1 + math.sqrt(2
 # Test possible-route counter
 one_city = flightrouting.load_cities("1_city.csv")
 d = flightrouting.make_city_dict(one_city)
-assert routing.Routing(one_city).has_single_possible_route(d["c"], d["c"]) == True
+assert routing.Routing(one_city).single_possible_route(d["c"], d["c"]) == []
 
 three_cites = flightrouting.load_cities("3_cities.csv")
 d = flightrouting.make_city_dict(three_cities)
-assert routing.Routing(three_cities).has_single_possible_route(d["a"], d["b"]) == False
-assert routing.Routing(three_cities).exclude_leg(d["a"], d["b"]).has_single_possible_route(d["a"], d["b"]) == True
+assert routing.Routing(three_cities).single_possible_route(d["a"], d["b"]) == None
+assert str(routing.Routing(three_cities).exclude_leg(d["a"], d["b"]).single_possible_route(d["a"], d["b"])) == "[<Leg:a->c>, <Leg:c->b>]"
 
 four_cities = flightrouting.load_cities("triangle_cities.csv")
 d = flightrouting.make_city_dict(four_cities)
 four = routing.Routing(four_cities)
 four.remove_leg(d["a"], d["d"])
-assert four.has_single_possible_route(d["a"], d["d"]) == False
+assert four.single_possible_route(d["a"], d["d"]) == None
 four.remove_leg(d["a"], d["c"])
-assert four.has_single_possible_route(d["a"], d["d"]) == False
+assert four.single_possible_route(d["a"], d["d"]) == None
 four.remove_leg(d["b"], d["d"])
-assert four.has_single_possible_route(d["a"], d["d"]) == True
+assert str(four.single_possible_route(d["a"], d["d"])) == "[<Leg:a->b>, <Leg:b->c>, <Leg:c->d>]"
 
 
 # Test solver

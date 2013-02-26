@@ -64,6 +64,9 @@ class Ticket:
         
     def __str__(self):
         return self.__repr__()
+    
+    # Returns a list of legs which connect from_city to to_city.
+#    def itinerary(self, routing):
 
 # The graph itself is a routing, a set of legs to be flown.
 # Since it is a weighted graph, it is most convenient to represent it as a Leg matrix.
@@ -282,15 +285,18 @@ class Routing:
             
         return False 
      
-    # Returns True if there is only one route from from_city to to_city using all non-excluded edges
-    def has_single_possible_route(self, from_city, to_city): 
+    # Returns None if there are zero or at least two possible routes on non-excluded edges.
+    # If there is only one possible route, returns a list of that route's legs.
+    def single_possible_route(self, from_city, to_city): 
         cities = self.sorted_cities()
      
         discovered = {}
         processed  = {}
+        parent     = {}
         for city in cities:
             discovered[city] = 0
-            processed[city] = False
+            processed[city]  = False
+            parent[city]     = None
             
         discovered[from_city] = 1
         queue = deque([from_city])
@@ -302,13 +308,24 @@ class Routing:
             for next_city in connections:
                 if not discovered[next_city]:
                     discovered[next_city] += 1
+                    parent[next_city] = current_city
                     queue.append(next_city)
                 elif next_city != current_city:
                     discovered[next_city] += 1
             
             processed[current_city] = True
-         
-        return discovered[to_city] == 1        
+        
+        if discovered[to_city] != 1:
+            return None 
+        else:
+            # Trace parent cities backward to create a list of legs
+            reversed_legs = []
+            current_city = to_city
+            while current_city != from_city:
+                reversed_legs.append(self.matrix[parent[current_city]][current_city])
+                current_city = parent[current_city]
+                
+            return list(reversed(reversed_legs))
     
     # Returns True if a path from from_city to to_city exists.
     # Uses what included/excluded information it has, then
