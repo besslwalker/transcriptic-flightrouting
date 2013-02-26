@@ -153,7 +153,6 @@ d 0 1 1 0"""
 assert tri_route.are_connected(city_dict["a"], city_dict["b"]) == True
 assert tri_route.are_connected(city_dict["a"], city_dict["c"]) == True
 
-
 excluded = included.exclude_leg(city_dict["d"], city_dict["b"])
 #assert str(tri_route.excluded) != str(excluded.excluded)  # Routing no longer has .excluded
 assert str(excluded) == \
@@ -164,6 +163,27 @@ c 0 0 0 0
 d 0 0 1 0"""
 assert excluded.is_valid(tickets) == True
 assert excluded.cost(1.0, 0.2, tickets) == 1.0 * (math.sqrt(5) + 1 + math.sqrt(2)) + 0.2 * 3
+
+# Test possible-route counter
+one_city = flightrouting.load_cities("1_city.csv")
+d = flightrouting.make_city_dict(one_city)
+assert routing.Routing(one_city).has_single_possible_route(d["c"], d["c"]) == True
+
+three_cites = flightrouting.load_cities("3_cities.csv")
+d = flightrouting.make_city_dict(three_cities)
+assert routing.Routing(three_cities).has_single_possible_route(d["a"], d["b"]) == False
+assert routing.Routing(three_cities).exclude_leg(d["a"], d["b"]).has_single_possible_route(d["a"], d["b"]) == True
+
+four_cities = flightrouting.load_cities("triangle_cities.csv")
+d = flightrouting.make_city_dict(four_cities)
+four = routing.Routing(four_cities)
+four.remove_leg(d["a"], d["d"])
+assert four.has_single_possible_route(d["a"], d["d"]) == False
+four.remove_leg(d["a"], d["c"])
+assert four.has_single_possible_route(d["a"], d["d"]) == False
+four.remove_leg(d["b"], d["d"])
+assert four.has_single_possible_route(d["a"], d["d"]) == True
+
 
 # Test solver
 best = flightrouting.solve(routing.Routing([]), [], 1.0, 0.2)

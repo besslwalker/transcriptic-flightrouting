@@ -282,15 +282,17 @@ class Routing:
             
         return False 
      
-    # Returns the number of possible routes from from_city to to_city, using all non-excluded edges
-    def num_possible_routes(self, from_city, to_city):  
+    # Returns True if there is only one route from from_city to to_city using all non-excluded edges
+    def has_single_possible_route(self, from_city, to_city): 
+        cities = self.sorted_cities()
+     
         discovered = {}
         processed  = {}
         for city in cities:
             discovered[city] = 0
             processed[city] = False
             
-        discovered[from_city] = True
+        discovered[from_city] = 1
         queue = deque([from_city])
         while len(queue) != 0:
             current_city = queue.popleft()
@@ -298,13 +300,15 @@ class Routing:
             # Process
             connections = [next_city for next_city in self.matrix[current_city] if not self.matrix[current_city][next_city].excluded]
             for next_city in connections:
-                discovered[next_city] += 1
                 if not discovered[next_city]:
+                    discovered[next_city] += 1
                     queue.append(next_city)
+                elif next_city != current_city:
+                    discovered[next_city] += 1
             
             processed[current_city] = True
-            
-        return discovered[to_city]        
+         
+        return discovered[to_city] == 1        
     
     # Returns True if a path from from_city to to_city exists.
     # Uses what included/excluded information it has, then
