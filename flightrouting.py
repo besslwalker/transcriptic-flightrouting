@@ -108,11 +108,6 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
     if len(tickets) == 1 and tickets[0].from_city != tickets[0].to_city:
         return routing.include_leg(tickets[0].from_city, tickets[0].to_city)
         
-    # And if all the cities are in the tickets, it's no longer NP-complete;
-    # a greedy algorithm will do.
-#     if routing.sorted_cities() == ticket_sorted_cities(tickets):
-#         return routing.greedy(tickets)
-        
     # We must include any legs that form the only remaining path to fulfill a ticket.
 #     unconnected = routing.unconnected_tickets(tickets)
 #     for ticket in unconnected:
@@ -181,7 +176,7 @@ def main(args):
     tickets = dedup_tickets(all_tickets)  # removes duplicates; they affect nothing.
     
     unrouted = routing.Routing(cities).exclude_selfloops()
-    current_best = unrouted.simple(tickets)
+    current_best = unrouted.greedy(1.0, 0.2, tickets)
     solution = solve(unrouted, tickets, 1.0, 0.2, current_best)
     
     return solution
