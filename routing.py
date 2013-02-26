@@ -67,7 +67,9 @@ class Ticket:
         return self.__repr__()
     
     # Returns a list of legs which connect from_city to to_city.
-#    def itinerary(self, routing):
+    def itinerary(self, routing):
+        route, discoveries = routing.possible_route(self.from_city, self.to_city)
+        return route
 
 # The graph itself is a routing, a set of legs to be flown.
 # Since it is a weighted graph, it is most convenient to represent it as a Leg matrix.
@@ -285,10 +287,11 @@ class Routing:
             return True
             
         return False 
-     
-    # Returns None if there are zero or at least two possible routes on non-excluded edges.
-    # If there is only one possible route, returns a list of that route's legs.
-    def single_possible_route(self, from_city, to_city): 
+        
+    # Returns a list of legs from from_city to to_city along non-excluded edges,
+    # along with a dictionary counting how many times each city was discovered during
+    # the BFS.
+    def possible_route(self, from_city, to_city):
         cities = self.sorted_cities()
      
         discovered = {}
@@ -316,17 +319,25 @@ class Routing:
             
             processed[current_city] = True
         
-        if discovered[to_city] != 1:
-            return None 
+        # Trace parent cities backward to create a list of legs
+        reversed_legs = []
+        current_city = to_city
+        while current_city != from_city:
+            reversed_legs.append(self.matrix[parent[current_city]][current_city])
+            current_city = parent[current_city]
+            
+        return list(reversed(reversed_legs)), discovered
+        
+     
+    # Returns None if there are zero or at least two possible routes on non-excluded edges.
+    # If there is only one possible route, returns a list of that route's legs.
+    def single_possible_route(self, from_city, to_city): 
+        route, discoveries = self.possible_route(from_city, to_city)
+        
+        if discoveries[to_city] != 1:
+            return None
         else:
-            # Trace parent cities backward to create a list of legs
-            reversed_legs = []
-            current_city = to_city
-            while current_city != from_city:
-                reversed_legs.append(self.matrix[parent[current_city]][current_city])
-                current_city = parent[current_city]
-                
-            return list(reversed(reversed_legs))
+            return route
     
     # Returns True if a path from from_city to to_city exists.
     # Uses what included/excluded information it has, then
