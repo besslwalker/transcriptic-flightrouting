@@ -282,7 +282,7 @@ class Routing:
             
         return False 
      
-    # Returns the number of possible routes from from_city to to_city
+    # Returns the number of possible routes from from_city to to_city, using all non-excluded edges
     def num_possible_routes(self, from_city, to_city):  
         discovered = {}
         processed  = {}
@@ -296,7 +296,7 @@ class Routing:
             current_city = queue.popleft()
 
             # Process
-            connections = [next_city for next_city in self.matrix[current_city] if self.matrix[current_city][next_city].exists]
+            connections = [next_city for next_city in self.matrix[current_city] if not self.matrix[current_city][next_city].excluded]
             for next_city in connections:
                 discovered[next_city] += 1
                 if not discovered[next_city]:
