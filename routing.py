@@ -179,7 +179,6 @@ class Routing:
             if len(undecided_legs_to_city) == 1 and len(excluded_legs_to_city) == len(legs_to_city) - 1:
                 excluded_routing.add_leg(undecided_legs_to_city[0].from_city, to_city)
             
-                    
         # Optimization 4b: include necessary path from from_city
         # If from_city is a necessary origin, and only one path
         # from_city->B remains, we must include from_city->B.
@@ -281,7 +280,49 @@ class Routing:
         if leg.explicitly_excluded:
             return True
             
-        return False
+        return False    
+    
+    # Returns True if a path from from_city to to_city exists.
+    # Uses what included/excluded information it has, then
+    # falls back on BFS.    
+    def are_connected(self, from_city, to_city):
+        cities = self.sorted_cities()
+        
+        leg = self.matrix[from_city][to_city]
+        
+        if leg.included or leg.implicitly_included:
+            # Yay, we know there's a path!
+            return True
+        elif leg.explicitly_excluded:
+            # Yay, we know there's no such path!
+            return False
+        else:
+            # Oh bother, we have to do actual work.
+            discovered = {}
+            processed  = {}
+            for city in cities:
+                discovered[city] = False
+                processed[city] = False
+                
+            discovered[from_city] = True
+            queue = deque([from_city])
+            while len(queue) != 0:
+                city = queue.popleft()
+                # If we've reached the destination, obviously it's reachable!
+                if city == to_city:
+                    return True
+                
+                # Process
+                connections = [to_city for to_city in self.matrix[city] if self.matrix[city][to_city].exists]
+                for to_city in connections:
+                    if not discovered[to_city]:
+                        discovered[to_city] = True
+                        queue.append(to_city)
+                
+                processed[city] = True
+            else: # Whoops, we ran out of cities to check but never found the destination!
+                # This ticket can't be satisfied, so...
+                return False
         
     # Returns True if routes satisfying all tickets exist.  
     # Uses what information it can, then falls back on a naive BFS.

@@ -213,7 +213,7 @@ c 0 0 0 0
 d 0 1 1 0"""
 
 # Test five cities
-print "FIVE CITIES"
+print "FIVE CITIES, FIVE TICKETS"
 best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
 assert str(best) == \
 """  a b c d e
@@ -249,10 +249,9 @@ d 0 0 0 0"""
 # d 0 0 0 0 0 0
 # e 0 0 1 0 0 0
 # f 0 0 0 0 0 0"""
-
+# 
 # print "SIX CITIES FOUR CORNERS"
 # best = flightrouting.main(["flightrouting.py", "six_cities.csv", "corner_tickets.csv"])
-# print best
 # assert str(best) == \
 # """  a b c d e f
 # a 0 1 0 0 1 0
@@ -261,3 +260,7 @@ d 0 0 0 0"""
 # d 0 0 0 0 0 0
 # e 0 0 0 0 0 0
 # f 0 0 0 0 0 0"""
+# 
+# print "SEVEN CITIES, TEST TICKETS"
+# best = flightrouting.main(["flightrouting.py", "7_cities.csv", "tickets.csv"])
+# print best
