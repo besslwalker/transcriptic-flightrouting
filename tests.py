@@ -202,6 +202,7 @@ c 0 0 0"""
 two_tickets = [routing.Ticket(d["a"], d["c"]), routing.Ticket(d["a"], d["b"])]
 print "THREE CITIES, TWO TICKETS"
 best = flightrouting.solve(three_routing.exclude_selfloops(), two_tickets, 1.0, 0.2, three_routing.simple(two_tickets))
+print best
 assert str(best) == \
 """  a b c
 a 0 0 1
