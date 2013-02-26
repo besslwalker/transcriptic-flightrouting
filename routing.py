@@ -323,6 +323,10 @@ class Routing:
             else: # Whoops, we ran out of cities to check but never found the destination!
                 # This destination isn't reachable from this origin, so...
                 return False
+                
+    # Given a list of tickets, returns a list of those tickets that can't be satisfied.
+    def unconnected_tickets(self, tickets):
+        return [ticket for ticket in tickets if not self.are_connected(ticket.from_city, ticket.to_city)]
         
     # Returns True if routes satisfying all tickets exist.  
     # Uses what information it can, then falls back on a naive BFS.
