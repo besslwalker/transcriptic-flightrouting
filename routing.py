@@ -53,12 +53,13 @@ class Leg:
         
 # A Ticket consists of an origin City, a destination City, and a list of Legs to fly.
 class Ticket:
-    def __init__(self, from_city, to_city):
+    def __init__(self, from_city, to_city, set_required = True):
         self.from_city = from_city
         self.to_city   = to_city
         
-        self.from_city.required_origin = True
-        self.to_city.required_destination = True
+        if set_required:
+            self.from_city.required_origin = True
+            self.to_city.required_destination = True
         
     def __repr__(self):
         return "".join(["<Ticket:", str(self.from_city), "->", str(self.to_city), ">"])
@@ -183,6 +184,7 @@ class Routing:
             undecided_legs_to_city = [leg for leg in legs_to_city if leg.undecided]
             excluded_legs_to_city  = [leg for leg in legs_to_city if leg.excluded]
             if len(undecided_legs_to_city) == 1 and len(excluded_legs_to_city) == len(legs_to_city) - 1:
+#                print to_city, "was a necessary destination, adding", undecided_legs_to_city[0].from_city
                 excluded_routing.add_leg(undecided_legs_to_city[0].from_city, to_city)
             
         # Optimization 4b: include necessary path from from_city
@@ -193,6 +195,7 @@ class Routing:
             undecided_legs_from_city = [leg for leg in legs_from_city if leg.undecided]
             excluded_legs_from_city    = [leg for leg in legs_from_city if leg.excluded]
             if len(undecided_legs_from_city) == 1 and len(excluded_legs_from_city) == len(legs_from_city) - 1:
+#                print from_city, "was a necessary origin, adding", undecided_legs_from_city[0].to_city
                 excluded_routing.add_leg(from_city, undecided_legs_from_city[0].to_city)
         
         return excluded_routing
@@ -402,50 +405,12 @@ class Routing:
     # Returns True if routes satisfying all tickets exist.  
     def is_valid(self, tickets):
         return len(self.unconnected_tickets(tickets)) == 0
-        
-    # Returns True if the directed DFS starting from the given City is acyclic
-    # Stops the DFS and returns False if back edges are detected.
-    def DFS_DAG(self, from_city, state = None):
-        cities = self.sorted_cities()
-        if state == None:
-            state = {}
-            for city in cities:
-                state[city] = "undiscovered"
-                
-        state[from_city] = "discovered"
-        adjacencies = [leg.to_city for leg in self.matrix[from_city].values() if leg.exists]
-        for to_city in adjacencies:
-            if state[to_city] == "undiscovered":
-                is_dag = self.DFS_DAG(to_city, state)
-            if state[to_city] == "discovered": # but not completely processed
-                # Alert, alert, back edge found: graph is cyclic!
-                is_dag = False
-                
-            if not is_dag:
-                return False
-        
-        state[from_city] = "processed"
-        
-        return True
-    
-    # Returns True if the directed graph is acyclic 
-    def is_acyclic(self):
-        cities = self.sorted_cities()
-        
-        if len(cities) == 0:
-            return True
-        
-        return self.DFS_DAG(cities[0])
-            
+                    
     # Returns the total number of miles flown to satisfy the given Tickets
     # Currently assumes each leg of the routing is flown exactly once.
     def miles(self, tickets):
         miles = sum([leg.miles for leg in self.legs()])
         
-        if self.is_acyclic():
-            return miles
-        
-        print "It's not acyclic, but I'm not looking for repeated legs yet."
         return miles
         
     # Returns the total number of takeoffs flown to satisfy the given Tickets.
@@ -453,10 +418,6 @@ class Routing:
     def takeoffs(self, tickets):
         takeoffs = len(self.legs())
         
-        if self.is_acyclic():
-            return takeoffs
-            
-        print "It's not acyclic, but I'm not looking for repeated legs yet."        
         return takeoffs
             
     # Given costs per mile and per takeoff, and a list of Tickets, 
@@ -466,7 +427,7 @@ class Routing:
         takeoffs = self.takeoffs(tickets)
                 
         return miles * mile_cost + takeoffs * takeoff_cost
-        
+                
     # Returns a new Routing holding a simple solution to the problem: just take all the ticket legs.
     def simple(self, tickets):
         simple_routing = Routing(self.sorted_cities())
@@ -517,7 +478,8 @@ class Routing:
                         additional_cost = takeoff_cost + \
                                       miles_cost * greedy_routing.matrix[ticket.to_city][candidate.to_city].miles
                         if additional_cost < direct_cost:  # Poor customer, no direct flight for you!
-                            new_ticket = Ticket(ticket.to_city, candidate.to_city)
+                            # Do NOT change the requirement status of the cities!
+                            new_ticket = Ticket(ticket.to_city, candidate.to_city, set_required = False)
                             new_ticket.cost = additional_cost 
                             ticket_queue.remove(candidate)
                             ticket_queue.append(new_ticket)
@@ -536,7 +498,8 @@ class Routing:
                         additional_cost = takeoff_cost + \
                                       miles_cost * greedy_routing.matrix[candidate.from_city][ticket.from_city].miles
                         if additional_cost < direct_cost:  # No direct flight for you!
-                            new_ticket = Ticket(candidate.from_city, ticket.from_city)
+                            # Again, do NOT change the required status of the cities!
+                            new_ticket = Ticket(candidate.from_city, ticket.from_city, set_required = False)
                             new_ticket.cost = additional_cost
                             ticket_queue.remove(candidate)
                             ticket_queue.append(new_ticket)                                
