@@ -103,7 +103,7 @@ def solve(route, tickets, mile_cost, takeoff_cost, current_best = None):
     # Have we even got any tickets to connect?  If not, we're done.
     if len(tickets) == 0:
         if current_best == None:
-            current_best = routing
+            current_best = route
         return current_best
             
     # If we only have one ticket, we simply use the direct route -- or no route if it's a selfloop.
@@ -111,15 +111,7 @@ def solve(route, tickets, mile_cost, takeoff_cost, current_best = None):
         if  tickets[0].from_city != tickets[0].to_city:
             return route.include_leg(tickets[0].from_city, tickets[0].to_city)
         else:
-            return routing
-        
-    # We must include any legs that form the only remaining path to fulfill a ticket.
-#     unconnected = routing.unconnected_tickets(tickets)
-#     for ticket in unconnected:
-#         route = routing.single_possible_route(ticket.from_city, ticket.to_city)
-#         if route != None:  # There's exactly one possible route on non-excluded edges.
-#             for route_leg in route:
-#                 routing = routing.include_leg(route_leg.from_city, route_leg.to_city)
+            return route
         
     # Backtracks when we've ruled out a ticket's route
     for ticket in tickets:
@@ -132,16 +124,14 @@ def solve(route, tickets, mile_cost, takeoff_cost, current_best = None):
         if route.cost(mile_cost, takeoff_cost, tickets) >= best_cost:
             return current_best  # Since this one can't do better.
             
-    undecided_legs = sorted(routing.undecided_legs(), key = lambda leg: leg.miles)
+    undecided_legs = sorted(route.undecided_legs(), key = lambda leg: leg.miles)
     
     # We've run out of choices.  Update current_best if necessary, then return it.
     if len(undecided_legs) == 0:
         if route.is_valid(tickets):
             cost = route.cost(mile_cost, takeoff_cost, tickets)
             if current_best == None or cost < current_best.cost(mile_cost, takeoff_cost, tickets):
-                current_best = routing
-#         else:
-#             print routing
+                current_best = route
         return current_best
             
     branch_leg = undecided_legs[-1]
@@ -152,7 +142,7 @@ def solve(route, tickets, mile_cost, takeoff_cost, current_best = None):
     # Bounds when including the branch leg will be too costly
     if current_best != None:
         best_cost = current_best.cost(mile_cost, takeoff_cost, tickets)
-        routing_cost = route.cost(mile_cost, takeoff_cost, tickets)
+        route_cost = route.cost(mile_cost, takeoff_cost, tickets)
         if route_cost + (branch_leg.miles * mile_cost) + takeoff_cost >= best_cost:
             skip_inclusion = True  # Adding this leg can't do any better
     
