@@ -1,5 +1,8 @@
 ## Analysis
 
+Clarification: Flying a leg costs $0.20 (for the takeoff) + $1.00 per mile flown.  It's the total cost
+of all the flights that must be minimized.
+
 This problem is reducible from the metric Steiner tree problem, which means it is NP complete.
 
 I suspect it's NP-complete even when all the cities are represented in the tickets,
@@ -21,10 +24,9 @@ And sometimes legs will need to be flown twice.  Take this example from my advis
 
 > I'm having to do some mental gymnastics to come up with a case, but here's one: 
 > Consider 100 cities spread equally spaced to form a circle.  Now consider 200 tickets.  One starting from each city going to the next clockwise.  Another starting from each city going two-over clockwise.  No matter how you slice things, for a minimal answer you need 101 legs, where one of those legs repeats a previous one.  (basically you fly all the way around the circle clockwise, stopping one step after you started to get that last person to their destination.
+- We might alternately consider the previous bad assumption as a constraint on the input, in which case it would be far more legitimate.  
   
-Flying a leg costs $0.20 (for the takeoff) + $1.00 per mile flown.  It's the total cost
-of all the flights that must be minimized.
-
+  
 ## Algorithm
 
 Since an optimal solution is required, a heuristic isn't good enough: a branch-and-bound approach is necessary.  The logically simplest element to branch on is the legs of the routing, since those are what we're concerned with finding.
