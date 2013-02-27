@@ -15,6 +15,11 @@ of the solution.
    whether we SHOULD.)
 - Airplanes have infinite capacity.  If a ticket needs to travel on a flight, it can,
   no matter how many other tickets are also on that flight.
+- BAD ASSUMPTION: as long as a flight is available, it can transport all passengers who need to take it by flying only once.
+This is not the same as the above assumption.  It simplifies the problem by breaking the cost function, assuming that the gas and takeoff cost for one leg pays for that leg no matter how many times that leg is flown.
+And sometimes legs will need to be flown twice.  Take this example from my advisor:
+> I'm having to do some mental gymnastics to come up with a case, but here's one: 
+> Consider 100 cities spread equally spaced to form a circle.  Now consider 200 tickets.  One starting from each city going to the next clockwise.  Another starting from each city going two-over clockwise.  No matter how you slice things, for a minimal answer you need 101 legs, where one of those legs repeats a previous one.  (basically you fly all the way around the circle clockwise, stopping one step after you started to get that last person to their destination.
   
 Flying a leg costs $0.20 (for the takeoff) + $1.00 per mile flown.  It's the total cost
 of all the flights that must be minimized.
