@@ -202,12 +202,14 @@ assert str(four.single_possible_route(d["a"], d["d"])) == "[<Leg:a->b>, <Leg:b->
 best = flightrouting.solve(routing.Routing([]), [], 1.0, 0.2)
 assert str(best) == " "
 
+print "ONE CITY, NO TICKETS"
 one_city = flightrouting.load_cities("1_city.csv")
 best = flightrouting.solve(routing.Routing(one_city), [], 1.0, 0.2)
 assert str(best) == \
 """  c
 c 0"""
 
+print "ONE CITY, SELFLOOP TICKET"
 d = flightrouting.make_city_dict(one_city)
 best = flightrouting.solve(routing.Routing(one_city), [routing.Ticket(d["c"], d["c"])], 1.0, 0.2)
 assert str(best) == \
@@ -218,6 +220,7 @@ three_cities = flightrouting.load_cities("3_cities.csv")
 d = flightrouting.make_city_dict(three_cities)
 three_routing = routing.Routing(three_cities)
 
+print "THREE CITIES, NO TICKETS"
 best = flightrouting.solve(three_routing, [], 1.0, 0.2)
 assert str(best) == \
 """  a b c
@@ -225,6 +228,7 @@ a 0 0 0
 b 0 0 0
 c 0 0 0"""
 
+print "THREE CITIES, ONE TICKET"
 best = flightrouting.solve(three_routing, [routing.Ticket(d["a"], d["c"])], 1.0, 0.2)
 assert str(best) == \
 """  a b c
@@ -253,17 +257,47 @@ a 0 0 0 1
 b 0 0 0 0
 c 0 0 0 0
 d 0 1 1 0"""
+assert str(best.cost(1.0, 0.2, tri_tickets)) == str(1.0 * (1 + 2 * math.sqrt(2)) + 0.2 * 3)
+
+print "TRIANGLE+CENTER CITIES, GREEDY SOLUTION"
+greedy = tri_routing.greedy(1.0, 0.2, tri_tickets)
+assert str(greedy) == \
+"""  a b c d
+a 0 1 0 0
+b 0 0 1 0
+c 0 0 0 0
+d 0 0 0 0"""
+assert greedy.cost(1.0, 0.2, tri_tickets) == 1.0 * (math.sqrt(5) + 2) + 0.2 * 2
+
+# Test with the greedy solution as the upper bound
+print "TRIANGLE+CENTER CITIES, GREEDY UPPER BOUND"
+best = flightrouting.solve(tri_routing.exclude_selfloops(), tri_tickets, 1.0, 0.2, tri_routing.greedy(1.0, 0.2, tri_tickets))
+assert str(best) == \
+"""  a b c d
+a 0 0 0 1
+b 0 0 0 0
+c 0 0 0 0
+d 0 1 1 0"""
+
+print "TRIANGLE+CENTER CITIES, CALLING MAIN"
+best = flightrouting.main(["flightrouting.py", "triangle_cities.csv", "triangle_tickets.csv"])
+assert str(best) == \
+"""  a b c d
+a 0 0 0 1
+b 0 0 0 0
+c 0 0 0 0
+d 0 1 1 0"""
 
 # Test five cities
-print "FIVE CITIES, FIVE TICKETS"
-best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
-assert str(best) == \
-"""  a b c d e
-a 0 1 0 0 0
-b 0 0 1 0 0
-c 0 0 0 1 0
-d 0 0 0 0 1
-e 0 0 0 0 0"""
+# print "FIVE CITIES, FIVE TICKETS"
+# best = flightrouting.main(["flightrouting.py", "linear_cities.csv", "linear_tickets.csv"])
+# assert str(best) == \
+# """  a b c d e
+# a 0 1 0 0 0
+# b 0 0 1 0 0
+# c 0 0 0 1 0
+# d 0 0 0 0 1
+# e 0 0 0 0 0"""
 
 # Test ticket de-duplicator
 dup_tickets = flightrouting.load_tickets("dup_tickets.csv", flightrouting.make_city_dict(tri_cities))
@@ -292,7 +326,7 @@ assert str(routing.Routing(one_city).greedy(1.0, 0.2, [routing.Ticket(d["c"], d[
 """  c
 c 0"""
 
-# Greedy algorithm gives optimal solution that ignores city d.
+# Greedy algorithm gives good solution that ignores city d.
 print "GREEDY TRIANGLE TICKETS"
 tri_cities = flightrouting.load_cities("triangle_cities.csv")
 d = flightrouting.make_city_dict(tri_cities)
