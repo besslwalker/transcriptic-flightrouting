@@ -98,7 +98,7 @@ def ticket_sorted_cities(tickets):
 
 # Recursively solves the flight routing problem, returning the current best solution.   
 def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
-    # Have we even got any tickets left to connect?  If not, we're done.
+    # Have we even got any tickets to connect?  If not, we're done.
     if len(tickets) == 0:
         if current_best == None:
             current_best = routing
@@ -143,7 +143,7 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
         return current_best
             
     branch_leg = undecided_legs[-1]
-    
+        
     # INCLUSION
     skip_inclusion = False
     
@@ -170,6 +170,7 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
 def main(args):
     if len(args) != 3:
         print "  Usage: flightrouting.py <city_file> <ticket_file>\n"
+        return
     
     city_file = args[1]
     ticket_file = args[2]
