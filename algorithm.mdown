@@ -1,15 +1,29 @@
 ## Analysis
 
-This problem is reducible from the metric Steiner tree problem, which means it is NP complete.  
+This problem is reducible from the metric Steiner tree problem, which means it is NP complete.
 
-A greedy algorithm which simply adds legs as needed to fulfill tickets (removing legs then made redundant, similar to growing a minimum spanning tree) will provide a reasonable solution, but it will ignore any unticketed cities and therefore can't be guaranteed to be optimal.  (Unless all cities appear on tickets, in which case hurrah!)
+I suspect it's NP-complete even when all the cities are represented in the tickets,
+although I don't have a reduction to prove it.  The greedy algorithm I came up with
+certainly isn't guaranteed to be optimal in this case.  
 
+Assumptions: these have been made to simplify the problem.  It's already NP complete,
+and the purpose of the exercise is not the complexity of the problem but the architecture 
+of the solution.
+- There is always an airplane available to take off if we need it.
+  (Either there are infinite airplanes at each city, or we can teleport empty airplanes around;
+   either way, we don't need to worry about whether we CAN take off from a given city, merely
+   whether we SHOULD.)
+- Airplanes have infinite capacity.  If a ticket needs to travel on a flight, it can,
+  no matter how many other tickets are also on that flight.
+  
+Flying a leg costs $0.20 (for the takeoff) + $1.00 per mile flown.  It's the total cost
+of all the flights that must be minimized.
 
 ## Algorithm
 
 Since an optimal solution is required, a heuristic isn't good enough: a branch-and-bound approach is necessary.  The logically simplest element to branch on is the legs of the routing, since those are what we're concerned with finding.
 
-The routing produced by the greedy algorithm briefly described above provides a reasonable starting upper bound.
+The routing produced by the greedy algorithm described later provides a reasonable starting upper bound.
 
 ### Brute-force branching -- suitable only for very small examples, but shakes out I/O and verification issues
 
@@ -27,6 +41,7 @@ The routing produced by the greedy algorithm briefly described above provides a 
 - If the current graph has a cost >= the best-known graph's cost, bail.
 - If including the branching edge brings the cost over the best known, don't try that branch.
 - Start the current-best solution with a simple take-all-the-tickets graph, as an upper bound.
+- (Later) Start the current-best solution with a greedy solution as an upper bound.
 
 ### Polynomial time improvements based on shared cities.
 
@@ -49,6 +64,34 @@ The routing produced by the greedy algorithm briefly described above provides a 
 
 ### Polynomial time improvements based on required origins & destinations
 
-4a. If B is the destination of some ticket, and excluding A->B leaves only C->B as a possible path to B, we must include C->B.
+4a. If B is the destination of some ticket, and excluding A->B leaves only C->B as a possible leg to B, we must include C->B.
 
-4b. If A is the origin of some ticket, and excluding A->B leaves only A->C as a possible path from A, we must include A->C.
+4b. If A is the origin of some ticket, and excluding A->B leaves only A->C as a possible leg from A, we must include A->C.
+
+5. If excluding A->B leaves only one possible path between the cities of an as-yet-unfulfilled ticket,
+   we must include all undecided legs on that path.
+   (This turned out to slow my solution down -- I guess my implementation did too much work of its own.)
+   
+## Greedy Algorithm
+
+This produces a fairly good solution that doesn't use any unticketed cities.  It's based on a minimum spanning tree approach -- but as this graph is directed, it isn't guaranteed to produce either a minimum or a tree!
+
+0. The cost of a ticket is the cost of the direct leg that connects its cities.
+1. While there are tickets remaining, choose the one with the lowest cost.
+2. Add that ticket's direct leg A->B to the graph.
+3. For all tickets C->D from cities C which are connected to A,
+   compare the cost of C->D to the cost of B->D.
+   (The cost of C->A->B is already covered.)
+   If the cost of B->D is less, remove the ticket C->D from the ticket list and add the ticket B->D
+4. For all tickets E->F to cities F which connect to B,
+   compare the cost of E->F to the cost of E->A.
+   (The cost of A->B->F is already covered.)
+   If the cost of E->A is less, remove the ticket E->F and add the ticket E->A.
+   
+This is not guaranteed to be optimal even if all cities are ticketed, though.  For example, consider a line of cities:
+A  B  C  D
+Given the tickets A->C and B->D, this algorithm chooses exactly those legs to be flown.
+The optimal solution, however, is A->B->C->D.
+(Although no doubt the passengers would prefer the suboptimal solution!)
+
+Still, it makes a decent upper bound solution; it's as good as or better than a simple take-all-the-tickets approach.
