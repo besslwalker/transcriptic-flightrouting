@@ -403,11 +403,49 @@ class Routing:
     def is_valid(self, tickets):
         return len(self.unconnected_tickets(tickets)) == 0
         
+    # Returns True if the directed DFS starting from the given City is acyclic
+    # Stops the DFS and returns False if back edges are detected.
+    def DFS_DAG(self, from_city, state = None):
+        cities = self.sorted_cities()
+        if state == None:
+            state = {}
+            for city in cities:
+                state[city] = "undiscovered"
+                
+        state[from_city] = "discovered"
+        adjacencies = [leg.to_city for leg in self.matrix[from_city].values() if leg.exists]
+        for to_city in adjacencies:
+            if state[to_city] == "undiscovered":
+                is_dag = self.DFS_DAG(to_city, state)
+            if state[to_city] == "discovered": # but not completely processed
+                # Alert, alert, back edge found: graph is cyclic!
+                is_dag = False
+                
+            if not is_dag:
+                return False
+        
+        state[from_city] = "processed"
+        
+        return True
+    
+    # Returns True if the directed graph is acyclic 
+    def is_acyclic(self):
+        cities = self.sorted_cities()
+        
+        if len(cities) == 0:
+            return True
+        
+        return self.DFS_DAG(cities[0])
+            
     # Returns the total number of miles flown to satisfy the given Tickets
     # Currently assumes each leg of the routing is flown exactly once.
     def miles(self, tickets):
         miles = sum([leg.miles for leg in self.legs()])
         
+        if self.is_acyclic():
+            return miles
+        
+        print "It's not acyclic, but I'm not looking for repeated legs yet."
         return miles
         
     # Returns the total number of takeoffs flown to satisfy the given Tickets.
@@ -415,6 +453,10 @@ class Routing:
     def takeoffs(self, tickets):
         takeoffs = len(self.legs())
         
+        if self.is_acyclic():
+            return takeoffs
+            
+        print "It's not acyclic, but I'm not looking for repeated legs yet."        
         return takeoffs
             
     # Given costs per mile and per takeoff, and a list of Tickets, 
