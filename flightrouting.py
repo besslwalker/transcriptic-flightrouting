@@ -104,9 +104,12 @@ def solve(routing, tickets, mile_cost, takeoff_cost, current_best = None):
             current_best = routing
         return current_best
             
-    # If we only have one ticket, we simply use the direct route.
-    if len(tickets) == 1 and tickets[0].from_city != tickets[0].to_city:
-        return routing.include_leg(tickets[0].from_city, tickets[0].to_city)
+    # If we only have one ticket, we simply use the direct route -- or no route if it's a selfloop.
+    if len(tickets) == 1:
+        if  tickets[0].from_city != tickets[0].to_city:
+            return routing.include_leg(tickets[0].from_city, tickets[0].to_city)
+        else:
+            return routing
         
     # We must include any legs that form the only remaining path to fulfill a ticket.
 #     unconnected = routing.unconnected_tickets(tickets)
