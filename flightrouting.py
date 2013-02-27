@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 # Toy problem for Transcriptic
 # Bess L. Walker
 # 2-22-13
