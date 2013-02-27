@@ -33,6 +33,8 @@ Since an optimal solution is required, a heuristic isn't good enough: a branch-a
 
 The routing produced by the greedy algorithm described later provides a reasonable starting upper bound.
 
+Making my polynomial-time optimizations cascade actually made my solution slower.  I suspect this had to do with unwise new object creation.
+
 ### Brute-force branching -- suitable only for very small examples, but shakes out I/O and verification issues
 
 0. The current best-known solution is None.
