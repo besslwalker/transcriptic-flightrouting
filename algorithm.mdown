@@ -74,9 +74,8 @@ The routing produced by the greedy algorithm described later provides a reasonab
 
 4b. If A is the origin of some ticket, and excluding A->B leaves only A->C as a possible leg from A, we must include A->C.
 
-5. If excluding A->B leaves only one possible path between the cities of an as-yet-unfulfilled ticket,
-   we must include all undecided legs on that path.
-   (This turned out to slow my solution down -- I guess my implementation did too much work of its own.)
+If excluding A->B leaves only one possible path between the cities of an as-yet-unfulfilled ticket, we must include all undecided legs on that path.
+(This turned out to slow my solution down -- I guess my implementation did too much work of its own.)
    
 ## Greedy Algorithm
 
