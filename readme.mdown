@@ -1,4 +1,4 @@
-# Flight Routing (problem description by Max Hodak)
+# Flight Routing
 
 The solution can be run as:
 `./flightrouting.py <cityfile> <ticketsfile>`,
@@ -7,6 +7,8 @@ e.g.
 
 Tests can be run as:
 `python tests.py`
+
+(Problem description and solution guidelines by Max Hodak)
 
 ## Description
 
