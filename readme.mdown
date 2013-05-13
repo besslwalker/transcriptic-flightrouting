@@ -1,4 +1,4 @@
-# Flight Routing
+# Flight Routing (problem description by Max Hodak)
 
 The solution can be run as:
 `./flightrouting.py <cityfile> <ticketsfile>`,
