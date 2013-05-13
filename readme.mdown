@@ -1,7 +1,12 @@
 # Flight Routing
 
-* **Difficulty:** Medium
-* **Expected time:** 2 hours
+The solution can be run as:
+`./flightrouting.py <cityfile> <ticketsfile>`,
+e.g.
+`./flightrouting.py 6_cities.csv vee_tickets.csv`
+
+Tests can be run as:
+`python tests.py`
 
 ## Description
 
